@@ -63,6 +63,7 @@ import type {
   SeasonEvent,
   SoftwareSystem,
 } from "@/lib/binder-types"
+import { assetPath } from "@/lib/assets"
 import {
   deepDiveTabs,
   fullRobotDeepDive,
@@ -614,7 +615,7 @@ function SiteHeader({
         <a href="#hero" className="flex min-w-fit items-center gap-3">
           <span className="site-logo-mark">
             <img
-              src="/brand/hammerheads-logo.svg"
+              src={assetPath("/brand/hammerheads-logo.svg")}
               alt="Hammerheads logo"
               className="size-full object-contain"
             />
@@ -979,12 +980,8 @@ function MechanismDeepDiveDialog({
               <TabsContent key={tab.id} value={tab.id}>
                 <ScrollArea className="deep-dive-scroll">
                   <div className="deep-dive-content-layout" data-tab={tab.id}>
-                    <section className="deep-dive-intro-band">
-                      <figure className="deep-dive-shot-card">
-                        <img src={dive.image} alt={dive.imageAlt} />
-                        <figcaption>CAD / build reference</figcaption>
-                      </figure>
-                      <div className="deep-dive-intro-copy">
+                    <section className="deep-dive-summary-strip">
+                      <div className="deep-dive-summary-copy">
                         <p>{tab.label}</p>
                         <h2 className="team-display deep-dive-title">
                           {dive.title}
@@ -993,16 +990,15 @@ function MechanismDeepDiveDialog({
                           <AnnotatedText text={dive.kicker} />
                         </div>
                       </div>
+                      <div className="deep-dive-stats">
+                        {dive.stats.map((stat) => (
+                          <div key={stat.label}>
+                            <p>{stat.label}</p>
+                            <strong>{stat.value}</strong>
+                          </div>
+                        ))}
+                      </div>
                     </section>
-
-                    <div className="deep-dive-stats">
-                      {dive.stats.map((stat) => (
-                        <div key={stat.label}>
-                          <p>{stat.label}</p>
-                          <strong>{stat.value}</strong>
-                        </div>
-                      ))}
-                    </div>
 
                     {tab.id === "leds" && <LedPatternShowcase />}
 
@@ -1088,7 +1084,7 @@ function ImageComparisonSlider({
     <figure className="image-compare">
       <img
         className="image-compare-after"
-        src={compare.after}
+        src={assetPath(compare.after)}
         alt={compare.afterAlt}
         style={{ clipPath: `inset(0 0 0 ${position}%)` }}
       />
@@ -1096,7 +1092,7 @@ function ImageComparisonSlider({
         className="image-compare-before"
         style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
       >
-        <img src={compare.before} alt={compare.beforeAlt} />
+        <img src={assetPath(compare.before)} alt={compare.beforeAlt} />
       </div>
       <span className="image-compare-line" style={{ left: `${position}%` }}>
         <span />
@@ -1189,7 +1185,7 @@ function DevelopmentStoryPanel({
             className={cn(index === versionIndex && "is-active")}
             onClick={() => setVersionIndex(index)}
           >
-            <img src={version.image} alt={version.imageAlt} />
+            <img src={assetPath(version.image)} alt={version.imageAlt} />
             <span>{version.label}</span>
             <strong>{version.title}</strong>
           </button>
@@ -1549,7 +1545,10 @@ function SoftwareSection({ systems }: { systems: SoftwareSystem[] }) {
             <TabsContent key={system.name} value={system.name}>
               <article className="software-panel">
                 <div className="software-visual">
-                  <img src={visual.image} alt={`${system.name} software reference`} />
+                  <img
+                    src={assetPath(visual.image)}
+                    alt={`${system.name} software reference`}
+                  />
                   <p>{visual.caption}</p>
                 </div>
                 <div className="software-copy">

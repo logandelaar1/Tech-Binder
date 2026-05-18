@@ -7,6 +7,7 @@ import { api } from "../../convex/_generated/api"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import type { BinderContent } from "@/lib/binder-types"
+import { assetPath } from "@/lib/assets"
 import {
   fullRobotDeepDive,
   loganFieldNotes,
@@ -234,7 +235,7 @@ function PrintDeepDive({ dive }: { dive: MechanismDeepDive }) {
     <div className="grid break-inside-avoid gap-4 border-b border-border py-5 md:grid-cols-[0.34fr_0.66fr]">
       <figure className="overflow-hidden border border-border bg-muted/30">
         <img
-          src={dive.image}
+          src={assetPath(dive.image)}
           alt={dive.imageAlt}
           className="aspect-[4/3] w-full object-cover"
         />

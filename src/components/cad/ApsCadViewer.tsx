@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react"
 import { useAction, useQuery } from "convex/react"
 import { MousePointer2, Move, RefreshCw, ZoomIn } from "lucide-react"
 
 import { api } from "../../../convex/_generated/api"
+import { assetPath } from "@/lib/assets"
 import { cn } from "@/lib/utils"
 import { useUiStore } from "@/store/ui-store"
 
@@ -467,7 +468,7 @@ function applyViewerExplode(
     subsystemId === "full" ? [] : subsystemDbIds[subsystemId] ?? []
   const explodeOptions: ExplodeOptions =
     focusedDbIds.length > 0
-      ? { depthDampening: 0.82, magnitude: 1.85 }
+      ? { depthDampening: 0, magnitude: 4 }
       : { depthDampening: 0, magnitude: 4 }
   const viewerWithOptions = viewer as Autodesk.Viewing.Viewer3D & {
     explode: (scale: number, options?: ExplodeOptions) => void
@@ -1002,6 +1003,11 @@ export function ApsCadViewer({
       data-geometry-ready={geometryReady ? "true" : "false"}
       data-panel-position={panelPosition}
       data-viewer-ready={viewerReady ? "true" : "false"}
+      style={
+        {
+          "--aps-placeholder-image": `url("${assetPath("/media/icarus-version-2.png")}")`,
+        } as CSSProperties
+      }
     >
       <div className="aps-system-rail">
         <div className="a360-subsystem-list" aria-label="Subsystem isolation controls">

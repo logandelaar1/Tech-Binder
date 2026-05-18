@@ -36,6 +36,20 @@ bun run lint
 bun run build
 ```
 
+## GitHub Pages Deployment
+
+The site deploys from `.github/workflows/deploy-pages.yml` whenever `main` is pushed.
+
+Before the first deploy:
+
+1. Deploy Convex and keep APS secrets in Convex, not in GitHub Pages.
+2. In GitHub, go to `Settings -> Secrets and variables -> Actions` and add:
+   - `VITE_CONVEX_URL`: your deployed Convex URL.
+3. In GitHub, go to `Settings -> Pages` and set the source to `GitHub Actions`.
+
+The Pages build uses `/Tech-Binder/` as the Vite base path and writes a `404.html`
+fallback so `/print` and other SPA routes survive refreshes.
+
 ## Content
 
 Binder domain content lives in Convex through `convex/binder.ts` and `convex/fixtures.ts`. The frontend reads it with live Convex queries and only uses Zustand for local UI state such as selected tabs and dialog state.
