@@ -27,13 +27,7 @@ type ViewableOption = {
   node: Autodesk.Viewing.BubbleNode
 }
 
-type StaticApsViewerModel = {
-  urn: string
-  status: string
-  progress?: string
-  accessToken?: string
-  expiresIn?: number
-}
+const APS_MODEL_URN = import.meta.env.VITE_APS_MODEL_URN as string | undefined
 
 type ViewerWindow = Window & {
   THREE?: {
@@ -128,22 +122,28 @@ const viewerSubsystems: ViewerSubsystem[] = [
   },
 ]
 
-function getStaticApsViewerModel(): StaticApsViewerModel | null {
-  // Static hosting cannot safely mint Autodesk APS tokens. Keep this local
-  // model slot explicit so the binder stays backend-free at runtime.
-  return null
-}
-
-function staticApsTokenProvider(
+async function apsTokenProvider(
   callback: (token: string, expiresIn: number) => void
 ) {
-  const model = getStaticApsViewerModel()
+  const response = await fetch("/_api/aps/token")
 
-  if (!model?.accessToken) {
-    throw new Error("APS access token is not configured for this static build.")
+  if (!response.ok) {
+    throw new Error(
+      `APS token endpoint returned ${response.status}. Run \`bun dev\` or \`bun preview\` to enable the live CAD viewer.`
+    )
   }
 
-  callback(model.accessToken, model.expiresIn ?? 1_800)
+  const data = await response.json() as {
+    access_token?: string
+    expires_in?: number
+    error?: string
+  }
+
+  if (data.error || !data.access_token) {
+    throw new Error(data.error ?? "APS token response missing access_token.")
+  }
+
+  callback(data.access_token, data.expires_in ?? 3_600)
 }
 
 let apsViewerAssetsPromise: Promise<void> | undefined
@@ -244,11 +244,6 @@ function removeStaleApsViewerAssets(activeAssets: {
   }
 }
 
-function isModelLoadable(status?: string | null) {
-  if (!status) return false
-
-  return ["success", "complete"].includes(status.toLowerCase())
-}
 
 function normalizeNodeName(name: string) {
   return name.toLowerCase().replace(/\s+/g, " ").trim()
@@ -575,7 +570,6 @@ export function ApsCadViewer({
   systemControls,
   className,
 }: ApsCadViewerProps) {
-  const model = getStaticApsViewerModel()
   const selectedCadSubsystem = useUiStore(
     (state) => state.selectedCadSubsystem
   )
@@ -607,9 +601,7 @@ export function ApsCadViewer({
   const selected = viewerSubsystems.find(
     (subsystem) => subsystem.id === selectedCadSubsystem
   )
-  const status = model?.status
-  const progress = model?.progress
-  const loadable = Boolean(model?.urn && model.accessToken && isModelLoadable(status))
+  const loadable = Boolean(APS_MODEL_URN)
 
   const applyViewerFocus = useCallback(
     (subsystemId: string) => {
@@ -700,8 +692,7 @@ export function ApsCadViewer({
   ])
 
   useEffect(() => {
-    const modelUrn = model?.urn
-    if (!modelUrn || !loadable || !containerRef.current) return
+    if (!APS_MODEL_URN || !loadable || !containerRef.current) return
 
     let cancelled = false
     let viewer: Autodesk.Viewing.Viewer3D | null = null
@@ -732,7 +723,7 @@ export function ApsCadViewer({
           {
             env: "AutodeskProduction2",
             api: "streamingV2",
-            getAccessToken: staticApsTokenProvider,
+            getAccessToken: apsTokenProvider,
           },
           () => {
             if (cancelled || !containerRef.current) {
@@ -759,7 +750,7 @@ export function ApsCadViewer({
             }
 
             window.Autodesk.Viewing.Document.load(
-              `urn:${modelUrn}`,
+              `urn:${APS_MODEL_URN}`,
               (document) => {
                 documentRef.current = document
                 const options = getViewableOptions(document)
@@ -880,7 +871,7 @@ export function ApsCadViewer({
         }
       }
     }
-  }, [loadable, model?.urn])
+  }, [loadable])
 
   useEffect(() => {
     const viewer = viewerRef.current
@@ -1157,13 +1148,9 @@ export function ApsCadViewer({
               {viewerError ??
                 (viewerReady && !geometryReady
                   ? "Loading model geometry..."
-                  : model
-                    ? model.accessToken
-                      ? `Translation status: ${status ?? "checking"} ${
-                          progress ? `(${progress})` : ""
-                        }`
-                      : "Static APS metadata is present, but no viewer token is available."
-                    : "Live APS tokens are not bundled into this static build, so the binder uses local CAD imagery here.")}
+                  : loadable
+                    ? "Fetching token and loading model..."
+                    : "No APS model URN configured. Set VITE_APS_MODEL_URN in .env.local.")}
             </p>
           </div>
         )}

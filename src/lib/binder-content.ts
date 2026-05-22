@@ -88,11 +88,11 @@ export const fullAssemblyTabs: BinderTab[] = [
     title: "Full assembly CAD",
     eyebrow: "Full Assembly",
     body:
-      "Use the live Fusion-derived assembly to orbit the full robot, isolate subsystems, ghost surrounding structure, and inspect the packaging that ties the scoring system together.",
+      "This page is the main place to look through the full Icarus 2.0 CAD. You can orbit around the robot, focus on specific subsystems, and use ghost mode when you still want to see the rest of the robot for context.",
     bullets: [
-      "The full assembly view is the main mechanical reference for Icarus 2.0.",
+      "The full assembly view is the main CAD reference for Icarus 2.0.",
       "Subsystem tabs focus the model on the superstructure, intakes, dye rotor, or turret.",
-      "Ghost mode keeps surrounding context visible when isolation hides too much of the robot.",
+      "Ghost mode is helpful when isolating one subsystem makes it hard to understand how everything fits together.",
     ],
     metrics: [
       { label: "Robot", value: "Icarus" },
@@ -107,7 +107,7 @@ export const fullAssemblyTabs: BinderTab[] = [
     title: "Icarus 2.0 Architecture",
     eyebrow: "Full Assembly",
     body:
-      "Icarus evolved into a scoring-first package built from CNC SRPP, mostly 6061 aluminum, low-backlash mechanisms, and competition-proven wiring habits.",
+      "Icarus 2.0 was built around a scoring-first design, using CNC SRPP, mostly 6061 aluminum, low-backlash mechanisms, and wiring practices that had already proven themselves through competition.",
     media: {
       src: "/media/icarus-version-2.png",
       alt: "Icarus 2.0 final robot render",
@@ -122,18 +122,18 @@ export const fullAssemblyTabs: BinderTab[] = [
     iterations: [
       {
         label: "Version 1",
-        title: "Early rebuild package",
+        title: "Week 0 test robot",
         body:
-          "Version 1 kept the high-throughput goal but still carried earlier packaging decisions and unfinished refinement around the intakes, turret, and hopper volume.",
-        image: "/media/icarus-version-1.png",
+          "Version 1 was basically our first full robot package that we threw together with the goal of testing everything at Week 0. It let us prove out the major ideas, find what was annoying to service, and see which parts of the robot needed to change before our first real event.",
+        image: "/media/icarus-version-2.png",
         alt: "Icarus version 1 CAD render",
       },
       {
         label: "Version 2",
-        title: "Championship package",
+        title: "First event rebuild",
         body:
-          "Version 2 tightened the structure, cleaned the turret and top plate packaging, improved subsystem access, and became the final championship reference.",
-        image: "/media/icarus-version-2.png",
+          "Version 2 was the rebuild after Week 0. We took what we learned from testing and turned it into the robot we actually wanted to compete with. The structure got cleaner, the packaging got tighter, and a lot of the small issues from the first version were fixed before our first event.",
+        image: "/media/icarus-version-1.png",
         alt: "Icarus version 2 CAD render",
       },
     ],
@@ -144,30 +144,30 @@ export const fullAssemblyTabs: BinderTab[] = [
     title: "LEDs as robot feedback",
     eyebrow: "Feedback + Debugging",
     body:
-      "LEDs were added as both a driver feedback tool and a quick visual debugging system. While they made Icarus look significantly cooler, the real value was giving the drive team and pit crew instant information without needing to stare at dashboards.",
+      "The LEDs were added partly because they made the robot look cooler, but they were also actually useful. They gave the drive team and pit crew quick information about what the robot was doing without needing to stare at a dashboard.",
     bullets: [
-      "The LED system communicated robot state, readiness, and match-flow information from across the field or pit.",
-      "Mounting needed to keep strips visible while avoiding direct impacts, intake contact, and pit-work damage.",
+      "The LEDs showed robot state, readiness, and match-flow information from across the field or in the pit.",
+      "The strips had to stay visible while still being protected from impacts, intake contact, and pit work.",
       "LED wiring was routed cleanly, strain relieved, labeled, and kept serviceable during panel or assembly removal.",
-      "LED states were treated as a communication system for enabled/disabled state, mechanism state, readiness, and debugging information.",
+      "LED states were treated like a real communication system for enabled/disabled state, mechanism state, readiness, and debugging.",
       "The system was designed so it could be disabled or ignored without affecting core robot function.",
     ],
     blocks: [
       {
         title: "Disabled and healthy",
-        body: "Rainbow pattern indicates the robot is disabled and system checks look normal.",
+        body: "A rainbow pattern means the robot is disabled and the main system checks look good.",
       },
       {
         title: "Low battery",
-        body: "Flashing red indicates battery voltage is below the desired threshold: 12.4 V at events and 12.1 V during testing.",
+        body: "Flashing red means the battery voltage is lower than we want: 12.4 V at events and 12.1 V during testing.",
       },
       {
         title: "Autonomous",
-        body: "A Cylon-style sweep shows the robot is enabled in autonomous.",
+        body: "A Cylon-style sweep shows that the robot is enabled in autonomous.",
       },
       {
         title: "Teleop shift progress",
-        body: "Progress bars communicate match periods. Purple represents transition/endgame, blue represents active scoring windows, and red represents inactive periods.",
+        body: "Progress bars show the flow of the match. Purple represents transition/endgame, blue represents active scoring windows, and red represents inactive periods.",
       },
     ],
   },
@@ -190,8 +190,8 @@ export const mechanicalSystems: MechanicalSystem[] = [
     label: "Superstructure",
     title: "Superstructure",
     summary:
-      "The robot backbone combines an SDS MK5n drivetrain, structural side plates, bellypan support, welded bumpers, and protected service access.",
-    image: "/media/icarus-version-2.png",
+      "The superstructure is the backbone of the robot, tying together the SDS MK5n drivetrain, side plates, bellypan, bumpers, electronics, and the service access we needed throughout the season.",
+    image: "/media/Superstructure.png",
     imageAlt: "Icarus superstructure CAD render",
     metrics: [
       { label: "Frame", value: "26 x 28.75 in" },
@@ -205,7 +205,7 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Overview",
         title: "Structural package",
         body:
-          "The superstructure was designed around internal fuel volume, intake support, turret mounting stiffness, and fast service access.",
+          "The superstructure was designed around fuel storage, intake support, turret stiffness, and being able to work on the robot quickly.",
         bullets: [
           "All aluminum is 6061 unless otherwise specified.",
           "Quarter-inch side plates carry intake loads and support the turret mounting plate.",
@@ -218,7 +218,12 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Drivetrain",
         title: "Swerve base",
         body:
-          "Four SDS MK5n modules use Kraken x60 drive motors and Kraken x44 steering motors on the R1 ratio.",
+          "The drivetrain uses four SDS MK5n modules with Kraken x60 drive motors and Kraken x44 steering motors on the R1 ratio.",
+        media: {
+          src: "/media/Drive Train.png",
+          alt: "Drivetrain assembly",
+          caption: "Drivetrain with wheels and motors",
+        },
         bullets: [
           "Refire x44 adapter boards powered the CANcoders.",
           "Drive CAN wiring stayed daisy chained: drive motor to CANcoder to steer motor.",
@@ -231,7 +236,12 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Bumpers",
         title: "Bumpers as structure",
         body:
-          "The bumpers became part of the robot architecture, supporting weight savings, battery service, and traversal reliability.",
+          "The bumpers ended up being more than just bumpers. They became part of the robot's structure and helped with weight, battery access, and driving over field elements.",
+        media: {
+          src: "/media/Bumper Backer.png",
+          alt: "Bumper backer plate",
+          caption: "Aluminum bumper structure",
+        },
         bullets: [
           "Bumper foam was FoamByMail 3 lb cross-linked closed-cell foam cut to size.",
           "Backer plates were CNC machined from 3000-series aluminum, then welded after the bending plan became impractical.",
@@ -247,9 +257,9 @@ export const mechanicalSystems: MechanicalSystem[] = [
     label: "Intakes",
     title: "Dual Intake System",
     summary:
-      "Two compact side intakes use rack-and-pinion deployment, dead-axle rollers, SRPP hopper walls, and a sewn half-box fuel net.",
-    image: "/media/stub-roller-cross-section.png",
-    imageAlt: "Stub axle roller cross section",
+      "The robot used two compact side intakes with rack-and-pinion deployment, dead-axle rollers, SRPP hopper walls, and a sewn half-box fuel net.",
+    image: "/media/Intakes.png",
+    imageAlt: "Dual intake system assembly",
     metrics: [
       { label: "Deploy", value: "1 Kraken x44 each" },
       { label: "Feed", value: "1 Kraken x60 each" },
@@ -262,7 +272,7 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Overview",
         title: "Side acquisition",
         body:
-          "Rack-and-pinion deployment let each intake compress inward during side impacts while keeping the mechanism simple and compact.",
+          "The rack-and-pinion deployment let each intake compress inward during side hits while keeping the whole mechanism simple and compact.",
         bullets: [
           "The same four intake plates ran through all four competitions with no tooth-chipping issues.",
           "Both intakes consumed about 1.3 inches per side when closed.",
@@ -274,7 +284,7 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Rollers",
         title: "Dead-axle roller stack",
         body:
-          "The intake rollers were built around polycarbonate tube, printed pulley caps, turned stub axles, and shared end-cap geometry for part simplification.",
+          "The intake rollers were built from polycarbonate tube, printed pulley caps, turned stub axles, and shared end-cap geometry to keep the parts simpler.",
         bullets: [
           "Rollers use 2 1/16 inch long, 1 7/8 inch ID, 2 inch OD polycarbonate tube from McMaster-Carr.",
           "Upper pulley end caps were printed in Bambu PETG-CF; the lower impact-prone caps used Overture 95A TPU.",
@@ -293,7 +303,12 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Structure",
         title: "Racks, kicker, and hopper walls",
         body:
-          "The intake structure leaned hard on SRPP because it tolerated impacts, Loctite exposure, and season-long abuse better than thin polycarbonate.",
+          "The intake structure used a lot of SRPP because it handled impacts, Loctite exposure, and season-long abuse better than thin polycarbonate.",
+        media: {
+          src: "/media/Intakes.png",
+          alt: "Intake structure frame",
+          caption: "Intake frame and mechanism",
+        },
         bullets: [
           "3/8 inch, 10 DP SRPP racks were laminated from two CNC machined 3/16 inch SRPP sheets using 3M 8005 glue.",
           "Rack bonding surfaces were lightly sanded with 80 grit, cleaned with acetone, then clamped with bolts and pan-head washers for 24 hours.",
@@ -307,13 +322,18 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Net",
         title: "Half-box hopper net",
         body:
-          "The intake hopper net started as a quick fabric solution and became a deliberate capacity feature.",
+          "The hopper net started as a quick fabric fix, but it ended up being a real capacity feature.",
         bullets: [
           "The first version used extra black bumper fabric; the final version used athletic jersey mesh from Amazon.",
           "The net was sewn as a half box so fuel pushed it into a box-like shape and increased usable capacity.",
           "The design avoided elastic so drivers did not need to worry about whether the robot could fit under the trench.",
           "Zip-tie locations were reinforced with stitching to prevent tearing.",
         ],
+        media: {
+          src: "/media/Net.png",
+          alt: "Intake hopper net assembly",
+          caption: "Half-box hopper net",
+        },
       },
     ],
   },
@@ -322,7 +342,7 @@ export const mechanicalSystems: MechanicalSystem[] = [
     label: "Dye Rotor",
     title: "Dye Rotor Indexer",
     summary:
-      "The dye rotor is the robot's compact coaxial indexer: separate hook and feed systems move fuel through a low bowl and into the turret.",
+      "The dye rotor is the robot's compact coaxial indexer. It uses separate hook and feed systems to move fuel through a low bowl and up into the turret.",
     image: "/media/dye-rotor-full-assembly.png",
     imageAlt: "Dye rotor full assembly",
     metrics: [
@@ -337,7 +357,7 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Overview",
         title: "Coaxial indexer",
         body:
-          "The dye rotor packages separate hook and feed systems into a very short vertical stack, with the base of the bowl sitting about 1.3 inches above the robot floor.",
+          "The dye rotor packages the hook and feed systems into a very short vertical stack. The base of the bowl sits about 1.3 inches above the robot floor, which helped keep the whole robot low and compact.",
         bullets: [
           "Hook and feed wheels are powered independently so fuel movement can be tuned separately.",
           "Feed wheels use two Kraken x44 motors geared roughly 1:1.",
@@ -357,42 +377,49 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Iterations",
         title: "Dye rotor development",
         body:
-          "The rotor went through several CAD generations before settling into the final coaxial indexer package.",
+          "The dye rotor went through a bunch of versions before landing on the final compact coaxial indexer setup.",
         iterations: [
           {
             label: "V1",
             title: "First rotor concept",
-            body: "Early geometry established the general bowl and moving-hook concept.",
+            body: "V1 was the first real prototype. It failed pretty much immediately and did not work well. The whole thing was too flimsy, but it helped prove what needed to change.",
             image: "/media/dye-rotor-v1.png",
             alt: "Dye rotor version 1",
           },
           {
             label: "V2",
-            title: "Feed path refinement",
-            body: "The feed path and indexing geometry became more deliberate as packaging constraints tightened.",
+            title: "Week 0 version",
+            body: "V2 worked much better and was the version that ran at Week 0. This was the first dye rotor version that felt like the concept could actually work on the full robot.",
             image: "/media/dye-rotor-v2.png",
             alt: "Dye rotor version 2",
           },
           {
             label: "V3",
-            title: "Coaxial packaging",
-            body: "The rotor stack moved toward the compact coaxial layout used by the final robot.",
+            title: "Icarus 2.0 redesign",
+            body: "V3 was redesigned for Icarus 2.0. The biggest change was that the lid got taller, which helped with the updated robot packaging.",
             image: "/media/dye-rotor-v3.png",
             alt: "Dye rotor version 3",
           },
           {
             label: "V4",
-            title: "Manufacturable structure",
-            body: "Printed and machined parts were revised for easier assembly, access, and reliability.",
+            title: "Counter-rotating floor idea",
+            body: "V4 explored the idea of a counter-rotating floor to speed up the dye rotor and increase throughput. It never ended up getting built because once we geared up the shooter wheels for long-distance shots, we did not have enough recovery time to take advantage of more balls per second.",
             image: "/media/dye-rotor-v4.png",
             alt: "Dye rotor version 4",
           },
           {
             label: "V5",
-            title: "Final indexer",
-            body: "The final rotor combines the low bowl, separate hook and feed, and compact turret handoff.",
+            title: "Final planned version",
+            body: "V5 was the final planned version. It took what we learned from the earlier versions and cleaned it into the best overall package. Unfortunately, it never ran at Worlds because the hook bent during transportation to Houston.",
             image: "/media/dye-rotor-v5.png",
             alt: "Dye rotor version 5",
+          },
+          {
+            label: "V6",
+            title: "Back to the proven setup",
+            body: "V6 was basically a return to V3 after V5 broke. We swapped back to the original V3-style setup because it was proven and reliable enough to get us through Worlds.",
+            image: "/media/dye-rotor-v6.png",
+            alt: "Dye rotor version 6",
           },
         ],
       },
@@ -403,7 +430,7 @@ export const mechanicalSystems: MechanicalSystem[] = [
     label: "Turret",
     title: "Inverted Pancake Turret",
     summary:
-      "A low-profile active turret with a large ring gear, compact cable path, hood adjustment, and high-energy shooter package.",
+      "The turret is a low-profile active shooter with a large ring gear, compact cable routing, hood adjustment, and a high-energy shooter package.",
     image: "/media/turret-v4.png",
     imageAlt: "Final turret CAD render",
     metrics: [
@@ -418,7 +445,7 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Overview",
         title: "Compact active shooter",
         body:
-          "The turret preserves hopper volume while letting the robot aim independently from chassis heading.",
+          "The turret was designed to take up as little space inside the robot as possible while still letting the robot aim independently from the drivetrain. The final package was only about 3 inches tall, which helped preserve a lot of internal hopper space.",
         bullets: [
           "The main turret gear plate is pocketed 6061 aluminum, water-jetted with a 10 DP gear tooth pattern around an 18 inch ring.",
           "Turret rotation uses a Kraken x44 through a 45:1 reduction, with shim tape used for near-zero backlash.",
@@ -437,26 +464,26 @@ export const mechanicalSystems: MechanicalSystem[] = [
         label: "Iterations",
         title: "Turret development",
         body:
-          "The turret shifted from early concept geometry into a compact inverted pancake package that better preserved hopper space.",
+          "The turret started as a quick early-season prototype and turned into a compact inverted pancake package that preserved as much hopper space as possible.",
         iterations: [
           {
             label: "V0",
             title: "Early turret concept",
-            body: "The first package explored the basic shooter, hood, and turret packaging envelope.",
+            body: "V0 was designed on day one of the season and was used for early prototyping and testing. It helped us get the basic shooter, hood, and turret ideas into CAD quickly.",
             image: "/media/turret-v0.png",
             alt: "Turret version 0",
           },
           {
             label: "V2",
-            title: "Mechanism integration",
-            body: "Power transmission, hood motion, and feed geometry moved into a tighter integrated assembly.",
+            title: "Week 0 turret",
+            body: "V2 was the version used during Week 0. By this point, the turret had SRPP plates and was much closer to something that could actually survive on the robot.",
             image: "/media/turret-v2.png",
             alt: "Turret version 2",
           },
           {
             label: "V4",
             title: "Final turret",
-            body: "The final turret uses the inverted pancake architecture, compact cable sleeve routing, and refined shooter/hood package.",
+            body: "V4 was the final turret design. It used the inverted pancake architecture, compact cable sleeve routing, and a refined shooter and hood package, all while staying extremely low-profile inside the robot.",
             image: "/media/turret-v4.png",
             alt: "Turret version 4",
           },
@@ -475,18 +502,12 @@ export const softwareTabs: BinderTab[] = [
     body:
       "Shot parameters were selected from lookup tables and corrected with time-of-flight recursion plus velocity-compensated turret tracking.",
     bullets: [
-      "Lookup tables use InterpolatingTreeMaps for hood angle, wheel angular velocity, and empirically measured time of flight from multiple hub distances.",
-      "Shoot-on-the-move uses five iterations of time-of-flight recursion.",
-      "Turret velocity setpoint accounts for robot angular velocity, tangential translation relative to the target, and translational acceleration.",
-      "The position setpoint is latency-compensated using the velocity setpoint.",
-      "The passing target adjusts dynamically based on distance to account for roll and encourage clustering in the corner.",
-      "The robot begins scoring 2 seconds before an active shift starts and stops 1 second after it ends to maximize scoring time.",
+      "Lookup tables using InterpolatingTreeMaps for shot parameters (hood angle and wheel angular velocity) and time-of-flight measured empirically from various distances from the hub.",
+      "Shoot-on-the-move using 5 iterations of time-of-flight recursion.",
+      "Turret tracking using velocity compensation: velocity setpoint is derived from the robot's angular velocity (to counteract robot rotation), translational velocity (to account for tangential motion relative to the target), and translational acceleration (to account for changing shoot-on-the-move). Position setpoint is latency-compensated using the velocity setpoint.",
+      "Passing target dynamically adjusts based on distance to account for roll and encourage clustering in the corner.",
+      "Robot automatically begins scoring 2 seconds before an active shift starts and stops 1 second after the shift ends to maximize scoring time.",
     ],
-    media: {
-      src: "/media/final-icarus-viewer-layout.png",
-      alt: "Shot pipeline and robot software visualization",
-      caption: "Shot pipeline reference",
-    },
   },
   {
     id: "zones",
@@ -496,10 +517,10 @@ export const softwareTabs: BinderTab[] = [
     body:
       "Zone logic triggered automatic hood ducking, trench alignment, and shooting pauses based on where the robot was and where it was about to be.",
     bullets: [
-      "The robot autonomously triggers zone-based actions such as ducking the hood under the trench and pausing shooting behind the tower.",
-      "Auto-align controls heading and Y position through the trenches.",
-      "Predictive zones account for actions that take time, allowing the robot to score while partially in the trench while still ducking the hood in time.",
-      "Zone and PredictiveZone interfaces make it easy to combine multiple field regions into one behavior.",
+      "Robot autonomously triggers zone-based actions, such as ducking the hood under the trench and pausing shooting behind the tower.",
+      "Auto-align through the trenches for heading and Y position.",
+      "Predictive zones allow for actions that take time, such as aligning to the trenches and ducking the hood, by determining whether the robot will be in the zone in a set amount of time. This lets the robot score while partially in the trench while giving enough time to duck the hood, and it lets the robot drive close to the trench without auto align triggering until it is driving towards the trench.",
+      "Zone and PredictiveZone interfaces allow easy combination of zones to act as one zone.",
     ],
   },
   {
@@ -516,7 +537,7 @@ export const softwareTabs: BinderTab[] = [
       "Redundant sightlines helped when field elements, defenders, or the robot structure blocked individual cameras.",
     ],
     media: {
-      src: "/media/final-icarus-viewer-layout.png",
+      src: "/media/CAMERAS.png",
       alt: "Six-camera vision and odometry software reference",
       caption: "360 vision concept",
     },
@@ -529,24 +550,12 @@ export const softwareTabs: BinderTab[] = [
     body:
       "FuelSim was a drop-in simulation helper built early in the season to test fuel dynamics, autonomous behavior, and simulated driver practice.",
     bullets: [
-      "Runs physics simulation of fuel with optional drag.",
-      "Simulates collisions with game elements, the field, the robot, and other fuel.",
-      "Supports automatic intaking of game pieces.",
-      "Useful for simulated driver practice and autonomous testing.",
       "Available on GitHub as a compact single-file utility.",
-    ],
-  },
-  {
-    id: "architecture",
-    label: "Architecture",
-    title: "Simulation-first controls",
-    eyebrow: "Robot code",
-    body:
-      "The codebase leaned on AdvantageKit, telemetry, simulation, and replay-friendly thinking so mechanical iteration had useful software feedback.",
-    bullets: [
-      "Simulation with AdvantageKit and custom FuelSim.",
-      "Shoot-on-the-move using time-of-flight recursion with lookup tables and velocity-compensated turret tracking.",
-      "Auto-align to the trenches and automatic hood ducking using predictive zones.",
+      "Mini-library built early in the season for testing fuel dynamics with simple drop-in usage.",
+      "Runs physics simulation of the fuel including optional drag simulation.",
+      "Collisions with game elements, field, robot, and between fuel.",
+      "Automatic intaking of game pieces.",
+      "Helpful for simulated driver practice and autonomous testing.",
     ],
   },
 ]
@@ -949,7 +958,7 @@ export const resources = [
   {
     label: "Championship CAD",
     kind: "CAD",
-    href: "https://a360.co/44b0UAF",
+    href: "https://a360.co/4wuUiK0",
     description: "Final public CAD reference linked from the build thread.",
   },
   {
@@ -976,57 +985,47 @@ export const thankYouCards = [
   {
     name: "Team 125",
     body:
-      "Thank you for the advice, examples, and New England standard-setting that helped push the robot and team forward.",
+      "Thank you for the advice, examples, and New England standard-setting that pushed the robot and team forward.",
   },
   {
     name: "Team 5687, The Outliers",
     body:
-      "Thank you for the collaboration, perspective, and the kind of competitive pressure that makes everyone better.",
+      "Thank you for the collaboration, perspective, and competitive pressure that made everyone sharper.",
   },
   {
     name: "Team 190",
     body:
-      "Thank you for being a strong partner and for helping make WPI one of the defining events of the season.",
+      "Thank you for being a strong partner and helping make WPI one of the defining events of the season.",
   },
   {
     name: "Team 6328",
     body:
-      "Thank you for the championship-level partnership in Hopper and for making the last event of the season feel like the robot had fully arrived.",
+      "Thank you for the championship-level partnership in Hopper and for helping the robot finish the year at its best.",
   },
   {
     name: "Team 1768",
     body:
-      "Thank you for the season-long competition and for the match that proved electrical reliability still has to survive robots making aggressive contact.",
+      "Thank you for the season-long competition and the reminder that reliability still has to survive real contact.",
   },
   {
     name: "NE FIRST",
     body:
-      "Thank you for building the district environment that lets teams iterate, compete, learn, and come back stronger every few weeks.",
+      "Thank you for building the district environment that lets teams iterate, compete, learn, and come back stronger.",
   },
   {
-    name: "FIRST",
+    name: "FIRST, FIRST HQ, and Volunteers",
     body:
-      "Thank you for creating the program that turns weird robot ideas into real engineering, real pressure, and real growth.",
-  },
-  {
-    name: "FIRST HQ",
-    body:
-      "Thank you for the event infrastructure, game, and championship experience that made the season possible.",
-  },
-  {
-    name: "FIRST Volunteers",
-    body:
-      "Thank you for every inspection, field reset, queue call, score table fix, and long day that made the events run.",
+      "Thank you for the game, events, field work, inspections, score table fixes, queue calls, and long days that made the season possible.",
   },
   {
     name: "Chief Delphi",
     body:
-      "Thank you for being the place where build threads, feedback, arguments, and weirdly specific robot knowledge all live in public.",
+      "Thank you for being the place where build threads, feedback, arguments, and weirdly specific robot knowledge can live in public.",
   },
   {
     name: "Parents & Mentors",
     body:
-      "Thank you for the rides, food, late nights, machine help, sanity checks, and the patience required to support a season like this.",
+      "Thank you for the rides, food, late nights, machine help, sanity checks, and patience required to support a season like this.",
   },
   {
     name: "Cooper / @cpennell20",

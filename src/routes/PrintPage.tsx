@@ -13,7 +13,6 @@ import {
   seasonEvents,
   seasonStats,
   softwareTabs,
-  thankYouCards,
 } from "@/lib/binder-content"
 import { cn } from "@/lib/utils"
 
@@ -75,9 +74,15 @@ export function PrintPage() {
         </PrintSection>
 
         <PrintSection title="Software">
-          <div className="print-card-grid">
-            {softwareTabs.map((tab) => (
-              <article key={tab.id}>
+          {softwareTabs.map((tab) => (
+            <article key={tab.id} className={tab.id === "cameras" ? "print-software-cameras" : "print-software-text"}>
+              {tab.id === "cameras" && tab.media && (
+                <figure>
+                  <img src={assetPath(tab.media.src)} alt={tab.media.alt} />
+                  {tab.media.caption && <figcaption>{tab.media.caption}</figcaption>}
+                </figure>
+              )}
+              <div>
                 <h3>{tab.title}</h3>
                 {tab.body && <p>{tab.body}</p>}
                 {tab.bullets && (
@@ -87,9 +92,9 @@ export function PrintPage() {
                     ))}
                   </ul>
                 )}
-              </article>
-            ))}
-          </div>
+              </div>
+            </article>
+          ))}
         </PrintSection>
 
         <PrintSection title="Manufacturing">
@@ -133,17 +138,6 @@ export function PrintPage() {
               {event.awards.length > 0 && <p>Awards: {event.awards.join(", ")}</p>}
             </article>
           ))}
-        </PrintSection>
-
-        <PrintSection title="Thank You">
-          <div className="print-card-grid">
-            {thankYouCards.map((card) => (
-              <article key={card.name}>
-                <h3>{card.name}</h3>
-                <p>{card.body}</p>
-              </article>
-            ))}
-          </div>
         </PrintSection>
       </article>
     </main>

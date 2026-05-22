@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from "react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { useTheme } from "next-themes"
 import {
   ArrowUpRight,
@@ -155,9 +155,30 @@ function TopNav({
   onMobileOpenChange: (open: boolean) => void
   onManufacturingOpen: () => void
 }) {
+  const scrollToSection = (href: string) => {
+    const id = href.replace("#", "")
+    const target = document.getElementById(id)
+    if (!target) return
+
+    const headerHeight =
+      document.querySelector(".site-header")?.getBoundingClientRect().height ?? 0
+    const top = target.getBoundingClientRect().top + window.scrollY - headerHeight
+
+    window.history.pushState(null, "", href)
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" })
+  }
+
   return (
     <header className="site-header">
-      <a className="brand-lockup" href="#mechanical" aria-label="Team 5000 Tech Binder">
+      <a
+        className="brand-lockup"
+        href="#mechanical"
+        aria-label="Team 5000 Tech Binder"
+        onClick={(event) => {
+          event.preventDefault()
+          scrollToSection("#mechanical")
+        }}
+      >
         <img
           src={assetPath("/brand/hammerheads-logo.svg")}
           alt=""
@@ -177,6 +198,10 @@ function TopNav({
               key={item.href}
               className={cn("nav-link", activeSection === id && "is-active")}
               href={item.href}
+              onClick={(event) => {
+                event.preventDefault()
+                scrollToSection(item.href)
+              }}
             >
               {item.label}
             </a>
@@ -193,7 +218,7 @@ function TopNav({
           onClick={onManufacturingOpen}
         >
           <Factory className="size-4" />
-          <span>Manufacturing archive</span>
+          <span>Manufacturing</span>
         </button>
         <a className="icon-button" href={assetPath("/print")} aria-label="Print binder">
           <Printer className="size-4" />
@@ -215,7 +240,11 @@ function TopNav({
             <a
               key={item.href}
               href={item.href}
-              onClick={() => onMobileOpenChange(false)}
+              onClick={(event) => {
+                event.preventDefault()
+                scrollToSection(item.href)
+                onMobileOpenChange(false)
+              }}
             >
               {item.label}
             </a>
@@ -336,27 +365,37 @@ function MechanicalSection() {
             panelCollapsed && "is-collapsed"
           )}
         >
-          <button
-            type="button"
-            className="panel-collapse-toggle"
-            aria-label={panelCollapsed ? "Expand notes panel" : "Collapse notes panel"}
-            onClick={() => setPanelCollapsed((collapsed) => !collapsed)}
-          >
-            {panelCollapsed ? (
+          {panelCollapsed ? (
+            <button
+              type="button"
+              className="panel-collapse-toggle"
+              aria-label="Expand notes panel"
+              onClick={() => setPanelCollapsed(false)}
+            >
               <ChevronRight className="size-5" />
-            ) : (
-              <ChevronLeft className="size-5" />
-            )}
-          </button>
-          {!panelCollapsed && (
+            </button>
+          ) : (
             <>
-              <PillTabs
-                tabs={system.tabs}
-                activeId={activeTab.id}
-                onSelect={(nextTab) =>
-                  setTabBySystem((current) => ({ ...current, [system.id]: nextTab }))
-                }
-              />
+              <div className="floating-panel-tabbar">
+                <PillTabs
+                  tabs={system.tabs}
+                  activeId={activeTab.id}
+                  onSelect={(nextTab) =>
+                    setTabBySystem((current) => ({
+                      ...current,
+                      [system.id]: nextTab,
+                    }))
+                  }
+                />
+                <button
+                  type="button"
+                  className="panel-collapse-toggle"
+                  aria-label="Collapse notes panel"
+                  onClick={() => setPanelCollapsed(true)}
+                >
+                  <ChevronLeft className="size-5" />
+                </button>
+              </div>
               <TabContent tab={activeTab} system={system} />
             </>
           )}
@@ -384,15 +423,12 @@ function MobileCadFallback({
           <figure>
             <img src={assetPath(system.image)} alt={system.imageAlt} />
           </figure>
-          <div>
-            <p className="eyebrow">{system.label} CAD preview</p>
-            <strong>CAD preview is optimized for compact screens.</strong>
-            <p>
-              Use the image preview for a cleaner mobile read, or open the larger
-              CAD stage if you want to inspect the robot anyway.
-            </p>
+          <div className="mobile-cad-banner">
+            <div>
+              <p>Viewing image. Open CAD stage to inspect the model.</p>
+            </div>
             <button type="button" className="mobile-cad-toggle" onClick={onShowCad}>
-              Show CAD view
+              Show CAD
             </button>
           </div>
         </>
@@ -463,10 +499,6 @@ function TabMedia({
   tab: BinderTab
   fallback: MechanicalSystem
 }) {
-  if (["shooting", "zones", "cameras", "fuelsim", "architecture"].includes(tab.id)) {
-    return <SoftwareVisualStage tab={tab} />
-  }
-
   if (tab.id === "leds") {
     return <LedVisualStage />
   }
@@ -552,7 +584,6 @@ function TabContent({
           ))}
         </div>
       )}
-      {tab.id === "leds" && <LedPatternShowcase />}
     </div>
   )
 }
@@ -582,34 +613,78 @@ function ManufacturingModal({
 
 function ComparisonSlider({ iterations }: { iterations: Iteration[] }) {
   const [position, setPosition] = useState(50)
+  const [isDragging, setIsDragging] = useState(false)
+  const stageRef = useRef<HTMLDivElement>(null)
   const before = iterations[0]
   const after = iterations[1]
 
+  const handleMouseDown = () => setIsDragging(true)
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const container = stageRef.current
+      if (!container) return
+
+      const rect = container.getBoundingClientRect()
+      const percent = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
+      setPosition(percent)
+    }
+
+    const handleMouseUp = () => setIsDragging(false)
+
+    document.addEventListener("mousemove", handleMouseMove)
+    document.addEventListener("mouseup", handleMouseUp)
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove)
+      document.removeEventListener("mouseup", handleMouseUp)
+    }
+  }, [isDragging])
+
   return (
     <div className="comparison-module">
-      <div className="comparison-stage">
-        <img src={assetPath(after.image)} alt={after.alt} className="comparison-img" />
+      <div
+        ref={stageRef}
+        className="comparison-stage"
+        role="img"
+        aria-label={`Compare ${before.label} and ${after.label}`}
+      >
+        <div className="comparison-fill comparison-fill-before" />
+        <div
+          className="comparison-fill comparison-fill-after"
+          style={{ clipPath: `inset(0 0 0 ${position}%)` }}
+        />
+        <img
+          src={assetPath(after.image)}
+          alt={after.alt}
+          className="comparison-img comparison-after"
+          style={{ clipPath: `inset(0 0 0 ${position}%)` }}
+        />
         <img
           src={assetPath(before.image)}
           alt={before.alt}
           className="comparison-img comparison-before"
           style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
         />
-        <div className="comparison-handle" style={{ left: `${position}%` }} />
-        <input
-          aria-label="Compare robot versions"
-          min="0"
-          max="100"
-          value={position}
-          type="range"
-          onChange={(event) => setPosition(Number(event.currentTarget.value))}
+        <div
+          className="comparison-handle"
+          style={{ left: `${position}%` }}
+          onMouseDown={handleMouseDown}
+          role="slider"
+          aria-label="Drag to compare versions"
+          aria-valuenow={Math.round(position)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          tabIndex={0}
         />
       </div>
       <div className="comparison-labels">
         <span>{before.label}</span>
         <span>{after.label}</span>
       </div>
-      <p>{position < 50 ? before.body : after.body}</p>
+      <p className="comparison-copy">{position < 50 ? before.body : after.body}</p>
     </div>
   )
 }
@@ -620,9 +695,21 @@ function IterationSlider({ iterations }: { iterations: Iteration[] }) {
 
   return (
     <div className="iteration-module">
-      <figure key={iteration.image} className="media-frame iteration-visual">
-        <img src={assetPath(iteration.image)} alt={iteration.alt} />
-        <figcaption>
+      <figure className="media-frame iteration-visual">
+        <div className="iteration-frame-stack">
+          {iterations.map((item, itemIndex) => (
+            <img
+              key={item.image}
+              src={assetPath(item.image)}
+              alt={item.alt}
+              className={cn(
+                "iteration-frame-img",
+                itemIndex === index && "is-active"
+              )}
+            />
+          ))}
+        </div>
+        <figcaption key={iteration.image}>
           {iteration.label} | {iteration.title}
         </figcaption>
       </figure>
@@ -647,70 +734,40 @@ function IterationSlider({ iterations }: { iterations: Iteration[] }) {
           </button>
         ))}
       </div>
-      <p>{iteration.body}</p>
-    </div>
-  )
-}
-
-function LedPatternShowcase() {
-  const patterns = [
-    {
-      className: "rainbow",
-      label: "Disabled + healthy",
-      description: "Rainbow confirms the robot is disabled and checks are normal.",
-    },
-    {
-      className: "low-battery",
-      label: "Low battery",
-      description: "Flashing red flags voltage below the event or testing threshold.",
-    },
-    {
-      className: "cylon",
-      label: "Autonomous enabled",
-      description: "A scanning sweep makes autonomous state obvious from the glass.",
-    },
-    {
-      className: "teleop",
-      label: "Teleop shifts",
-      description: "Segmented progress bars show active, inactive, and transition windows.",
-    },
-  ]
-
-  return (
-    <div className="led-pattern-grid" aria-label="LED pattern animations">
-      {patterns.map((pattern) => (
-        <article key={pattern.className} className="led-pattern-card">
-          <div className={cn("led-strip", pattern.className)} aria-hidden="true">
-            <span />
-          </div>
-          <h4>{pattern.label}</h4>
-          <p>{pattern.description}</p>
-        </article>
-      ))}
+      <p key={iteration.body} className="iteration-body">
+        {iteration.body}
+      </p>
     </div>
   )
 }
 
 function LedVisualStage() {
   const patterns = [
-    { label: "Disabled", className: "rainbow", detail: "Healthy / ready" },
-    { label: "Low battery", className: "low-battery", detail: "Voltage warning" },
-    { label: "Auto", className: "cylon", detail: "Enabled autonomous" },
-    { label: "Teleop", className: "teleop", detail: "Shift timing" },
+    {
+      label: "Disabled",
+      className: "rainbow",
+      detail: "Rainbow confirms the robot is disabled and checks are normal.",
+    },
+    {
+      label: "Low battery",
+      className: "low-battery",
+      detail: "Flashing red flags voltage below the event or testing threshold.",
+    },
+    {
+      label: "Autonomous",
+      className: "cylon",
+      detail: "A red scanning sweep makes autonomous state obvious from the glass.",
+    },
+    {
+      label: "Teleop",
+      className: "teleop",
+      detail: "Segmented progress bars show active, inactive, and transition windows.",
+    },
   ]
 
   return (
     <div className="led-visual-stage">
-      <div className="led-robot-silhouette" aria-hidden="true">
-        <div className="led-robot-frame">
-          <span className="led-edge top" />
-          <span className="led-edge right" />
-          <span className="led-edge bottom" />
-          <span className="led-edge left" />
-          <span className="led-turret-ring" />
-        </div>
-      </div>
-      <div className="led-visual-patterns">
+      <div className="led-visual-patterns" aria-label="LED pattern animations">
         {patterns.map((pattern) => (
           <article key={pattern.label}>
             <div className={cn("led-strip", pattern.className)} aria-hidden="true">
@@ -726,19 +783,21 @@ function LedVisualStage() {
 }
 
 function SoftwareSection() {
-  const [activeTab, setActiveTab] = useState(softwareTabs[0].id)
+  const [activeTab, setActiveTab] = useState("cameras")
   const tab = softwareTabs.find((item) => item.id === activeTab) ?? softwareTabs[0]
 
   return (
     <BinderSection
       id="software"
       eyebrow="Software"
-      title="Aiming while moving."
-      deck="The software stack turns a mechanically complex robot into a continuous scoring system: simulation, predictive zones, turret compensation, and timing-aware shots."
     >
       <section className="feature-panel">
         <div className="panel-media">
-          <TabMedia tab={tab} fallback={mechanicalSystems[0]} />
+          {tab.media ? (
+            <TabMedia tab={tab} fallback={mechanicalSystems[0]} />
+          ) : (
+            <SoftwareVisualStage tab={tab} />
+          )}
         </div>
         <div className="panel-copy">
           <PillTabs tabs={softwareTabs} activeId={tab.id} onSelect={setActiveTab} />
@@ -927,12 +986,7 @@ function OpenAllianceSection() {
 
 function ThanksSection() {
   return (
-    <BinderSection
-      id="thanks"
-      eyebrow="Thank You"
-      title="Robots are not solo projects."
-      deck="This season was carried by mentors, parents, partners, volunteers, public feedback, and teams willing to share what they know."
-    >
+    <BinderSection id="thanks" eyebrow="Thanks">
       <div className="thanks-grid">
         {thankYouCards.map((card) => (
           <article key={card.name} className="thanks-card">
@@ -947,6 +1001,9 @@ function ThanksSection() {
 
 function BinderSection({
   id,
+  eyebrow,
+  title,
+  deck,
   children,
 }: {
   id: string
@@ -955,7 +1012,20 @@ function BinderSection({
   deck?: string
   children: React.ReactNode
 }) {
-  return <section id={id} className="binder-section">{children}</section>
+  return (
+    <section id={id} className="binder-section">
+      {(eyebrow || title || deck) && (
+        <div className="section-label">
+          <div className="section-heading">
+            {title && <h2>{title}</h2>}
+            {eyebrow && <p className="eyebrow">{eyebrow}</p>}
+            {deck && <p>{deck}</p>}
+          </div>
+        </div>
+      )}
+      {children}
+    </section>
+  )
 }
 
 type GlossaryState = {
