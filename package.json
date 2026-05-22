@@ -8,9 +8,6 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "typecheck": "tsc -b",
-    "convex:dev": "convex dev",
-    "convex:seed": "convex run binder:seed",
-    "aps:upload": "bun scripts/aps-upload-model.ts",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -18,7 +15,6 @@
     "@fontsource-variable/geist": "^5.2.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "convex": "^1.38.0",
     "lucide-react": "^1.14.0",
     "next-themes": "^0.4.6",
     "react": "^19.2.6",
@@ -32,9 +28,6 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "@aps_sdk/authentication": "^1.0.1",
-    "@aps_sdk/model-derivative": "^1.2.1",
-    "@aps_sdk/oss": "^1.3.3",
     "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "^4.3.0",
     "@types/forge-viewer": "^7.99.1",

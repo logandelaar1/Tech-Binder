@@ -1,8 +1,13 @@
-import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react"
-import { useAction, useQuery } from "convex/react"
+import {
+  type CSSProperties,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react"
 import { MousePointer2, Move, RefreshCw, ZoomIn } from "lucide-react"
 
-import { api } from "../../../convex/_generated/api"
 import { assetPath } from "@/lib/assets"
 import { cn } from "@/lib/utils"
 import { useUiStore } from "@/store/ui-store"
@@ -22,9 +27,12 @@ type ViewableOption = {
   node: Autodesk.Viewing.BubbleNode
 }
 
-type ViewerToken = {
-  access_token: string
-  expires_in: number
+type StaticApsViewerModel = {
+  urn: string
+  status: string
+  progress?: string
+  accessToken?: string
+  expiresIn?: number
 }
 
 type ViewerWindow = Window & {
@@ -47,8 +55,11 @@ type ExplodeOptions = {
 }
 
 type ApsCadViewerProps = {
-  panelPosition: PanelPosition
-  onFocusChange: (subsystemId: string) => void
+  panelPosition?: PanelPosition
+  onFocusChange?: (subsystemId: string) => void
+  showSubsystemControls?: boolean
+  systemControls?: ReactNode
+  className?: string
 }
 
 const APS_VIEWER_ASSETS = [
@@ -116,6 +127,24 @@ const viewerSubsystems: ViewerSubsystem[] = [
     namePatterns: ["turret (1):1", "turret (1)", "turret"],
   },
 ]
+
+function getStaticApsViewerModel(): StaticApsViewerModel | null {
+  // Static hosting cannot safely mint Autodesk APS tokens. Keep this local
+  // model slot explicit so the binder stays backend-free at runtime.
+  return null
+}
+
+function staticApsTokenProvider(
+  callback: (token: string, expiresIn: number) => void
+) {
+  const model = getStaticApsViewerModel()
+
+  if (!model?.accessToken) {
+    throw new Error("APS access token is not configured for this static build.")
+  }
+
+  callback(model.accessToken, model.expiresIn ?? 1_800)
+}
 
 let apsViewerAssetsPromise: Promise<void> | undefined
 
@@ -366,10 +395,26 @@ function getViewableOptions(document: Autodesk.Viewing.Document): ViewableOption
 }
 
 function syncViewerBackground(viewer: Autodesk.Viewing.Viewer3D) {
-  viewer.setEnvMapBackground(false)
-  viewer.setGroundShadow(false)
-  viewer.setGroundReflection(false)
-  viewer.setBackgroundOpacity(0)
+  const viewerWithBackground = viewer as Autodesk.Viewing.Viewer3D & {
+    setEnvMapBackground?: (enabled: boolean) => void
+    setGroundShadow?: (enabled: boolean) => void
+    setGroundReflection?: (enabled: boolean) => void
+    setBackgroundOpacity?: (opacity: number) => void
+    setBackgroundColor?: (
+      redTop: number,
+      greenTop: number,
+      blueTop: number,
+      redBottom: number,
+      greenBottom: number,
+      blueBottom: number
+    ) => void
+  }
+
+  viewerWithBackground.setEnvMapBackground?.(false)
+  viewerWithBackground.setGroundShadow?.(false)
+  viewerWithBackground.setGroundReflection?.(false)
+  viewerWithBackground.setBackgroundOpacity?.(0)
+  viewerWithBackground.setBackgroundColor?.(255, 255, 255, 255, 255, 255)
 
   const viewerImpl = viewer.impl as Autodesk.Viewing.Viewer3D["impl"] & {
     renderer?: () => {
@@ -481,6 +526,15 @@ function applyViewerExplode(
 }
 
 function tuneViewer(viewer: Autodesk.Viewing.Viewer3D, model: Autodesk.Viewing.Model) {
+  const tunedViewer = viewer as Autodesk.Viewing.Viewer3D & {
+    setQualityLevel?: (ambientShadows: boolean, antialiasing: boolean) => void
+    setLightPreset?: (preset: number) => void
+    setReverseZoomDirection?: (enabled: boolean) => void
+    setZoomTowardsPivot?: (enabled: boolean) => void
+    setUsePivotAlways?: (enabled: boolean) => void
+    setOptimizeNavigation?: (enabled: boolean) => void
+  }
+
   const frameModel = () => {
     const Vector = (window as ViewerWindow).THREE?.Vector3
     if (!Vector) return
@@ -502,25 +556,26 @@ function tuneViewer(viewer: Autodesk.Viewing.Viewer3D, model: Autodesk.Viewing.M
     viewer.impl.invalidate(true, true, true)
   }
 
-  viewer.setQualityLevel(true, true)
-  viewer.setLightPreset(1)
+  tunedViewer.setQualityLevel?.(true, true)
+  tunedViewer.setLightPreset?.(1)
   syncViewerBackground(viewer)
-  viewer.setReverseZoomDirection(false)
-  viewer.setZoomTowardsPivot(true)
-  viewer.setUsePivotAlways(true)
-  viewer.setOptimizeNavigation(true)
+  tunedViewer.setReverseZoomDirection?.(false)
+  tunedViewer.setZoomTowardsPivot?.(true)
+  tunedViewer.setUsePivotAlways?.(true)
+  tunedViewer.setOptimizeNavigation?.(true)
   frameModel()
   window.setTimeout(frameModel, 250)
   window.setTimeout(frameModel, 1_500)
 }
 
 export function ApsCadViewer({
-  panelPosition,
+  panelPosition = "left",
   onFocusChange,
+  showSubsystemControls = true,
+  systemControls,
+  className,
 }: ApsCadViewerProps) {
-  const model = useQuery(api.aps.viewerModel, {})
-  const getViewerToken = useAction(api.aps.getViewerToken)
-  const getManifest = useAction(api.aps.getManifest)
+  const model = getStaticApsViewerModel()
   const selectedCadSubsystem = useUiStore(
     (state) => state.selectedCadSubsystem
   )
@@ -542,10 +597,6 @@ export function ApsCadViewer({
   const [activeViewableId, setActiveViewableId] = useState<string>("")
   const [explodeScale, setExplodeScale] = useState(0)
   const [focusMode, setFocusMode] = useState<FocusMode>("isolate")
-  const [manifestStatus, setManifestStatus] = useState<{
-    status: string
-    progress?: string
-  } | null>(null)
   const [subsystemDbIds, setSubsystemDbIds] = useState<Record<string, number[]>>(
     () =>
       Object.fromEntries(
@@ -556,17 +607,9 @@ export function ApsCadViewer({
   const selected = viewerSubsystems.find(
     (subsystem) => subsystem.id === selectedCadSubsystem
   )
-  const status = manifestStatus?.status ?? model?.status
-  const progress = manifestStatus?.progress ?? model?.progress
-  const loadable = isModelLoadable(status)
-
-  const tokenProvider = useCallback(
-    async (callback: (token: string, expiresIn: number) => void) => {
-      const token = (await getViewerToken({})) as ViewerToken
-      callback(token.access_token, token.expires_in)
-    },
-    [getViewerToken]
-  )
+  const status = model?.status
+  const progress = model?.progress
+  const loadable = Boolean(model?.urn && model.accessToken && isModelLoadable(status))
 
   const applyViewerFocus = useCallback(
     (subsystemId: string) => {
@@ -630,13 +673,13 @@ export function ApsCadViewer({
     setSelectedCadSubsystem(subsystem.id)
     setSelectedSystem(subsystem.mechanicalSystemId)
     setCadViewMode(subsystem.id === "super-structure" ? "powertrain" : "full")
-    onFocusChange(subsystem.id)
+    onFocusChange?.(subsystem.id)
   }
 
   function showFullAssembly() {
     setSelectedCadSubsystem("full")
     setCadViewMode("full")
-    onFocusChange("full")
+    onFocusChange?.("full")
   }
 
   useEffect(() => {
@@ -647,7 +690,7 @@ export function ApsCadViewer({
     if (!knownSubsystem) {
       setSelectedCadSubsystem("full")
       setCadViewMode("full")
-      onFocusChange("full")
+      onFocusChange?.("full")
     }
   }, [
     onFocusChange,
@@ -655,39 +698,6 @@ export function ApsCadViewer({
     setCadViewMode,
     setSelectedCadSubsystem,
   ])
-
-  useEffect(() => {
-    if (!model?.urn || loadable) return
-
-    let stopped = false
-
-    async function refreshManifest() {
-      try {
-        const manifest = await getManifest({ urn: model!.urn })
-        if (!stopped) {
-          setManifestStatus({
-            status: manifest.status,
-            progress: manifest.progress,
-          })
-        }
-      } catch (error) {
-        if (!stopped) {
-          setManifestStatus({
-            status: "checking",
-            progress: error instanceof Error ? error.message : "Retrying",
-          })
-        }
-      }
-    }
-
-    void refreshManifest()
-    const interval = window.setInterval(refreshManifest, 20_000)
-
-    return () => {
-      stopped = true
-      window.clearInterval(interval)
-    }
-  }, [getManifest, loadable, model])
 
   useEffect(() => {
     const modelUrn = model?.urn
@@ -722,7 +732,7 @@ export function ApsCadViewer({
           {
             env: "AutodeskProduction2",
             api: "streamingV2",
-            getAccessToken: tokenProvider,
+            getAccessToken: staticApsTokenProvider,
           },
           () => {
             if (cancelled || !containerRef.current) {
@@ -870,7 +880,7 @@ export function ApsCadViewer({
         }
       }
     }
-  }, [loadable, model?.urn, tokenProvider])
+  }, [loadable, model?.urn])
 
   useEffect(() => {
     const viewer = viewerRef.current
@@ -998,7 +1008,7 @@ export function ApsCadViewer({
 
   return (
     <div
-      className="aps-viewer-shell"
+      className={cn("aps-viewer-shell", className)}
       data-cad-focus={selectedCadSubsystem === "full" ? "full" : "subsystem"}
       data-geometry-ready={geometryReady ? "true" : "false"}
       data-panel-position={panelPosition}
@@ -1009,39 +1019,47 @@ export function ApsCadViewer({
         } as CSSProperties
       }
     >
-      <div className="aps-system-rail">
-        <div className="a360-subsystem-list" aria-label="Subsystem isolation controls">
-          <button
-            type="button"
-            className={cn(
-              "a360-subsystem-row",
-              selectedCadSubsystem === "full" && "is-active",
-              selectedCadSubsystem !== "full" && "is-muted"
-            )}
-            onClick={showFullAssembly}
-          >
-            <span>Full assembly</span>
-          </button>
+      <div
+        className={cn(
+          "aps-system-rail",
+          !showSubsystemControls && !systemControls && "is-controls-only"
+        )}
+      >
+        {systemControls}
+        {showSubsystemControls && (
+          <div className="a360-subsystem-list" aria-label="Subsystem isolation controls">
+            <button
+              type="button"
+              className={cn(
+                "a360-subsystem-row",
+                selectedCadSubsystem === "full" && "is-active",
+                selectedCadSubsystem !== "full" && "is-muted"
+              )}
+              onClick={showFullAssembly}
+            >
+              <span>Full assembly</span>
+            </button>
 
-          {viewerSubsystems.map((subsystem) => {
-            const active = selectedCadSubsystem === subsystem.id
+            {viewerSubsystems.map((subsystem) => {
+              const active = selectedCadSubsystem === subsystem.id
 
-            return (
-              <button
-                key={subsystem.id}
-                type="button"
-                className={cn(
-                  "a360-subsystem-row",
-                  active && "is-active",
-                  selected && !active && "is-muted"
-                )}
-                onClick={() => selectSubsystem(subsystem)}
-              >
-                <span>{subsystem.label}</span>
-              </button>
-            )
-          })}
-        </div>
+              return (
+                <button
+                  key={subsystem.id}
+                  type="button"
+                  className={cn(
+                    "a360-subsystem-row",
+                    active && "is-active",
+                    selected && !active && "is-muted"
+                  )}
+                  onClick={() => selectSubsystem(subsystem)}
+                >
+                  <span>{subsystem.label}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
         <div className="aps-explode-panel">
           {viewables.length > 1 && (
             <label className="aps-config-control" htmlFor="aps-config-select">
@@ -1096,6 +1114,14 @@ export function ApsCadViewer({
       </div>
 
       <div className="aps-viewer-stage">
+        {!geometryReady && (
+          <img
+            src={assetPath("/media/icarus-version-2.png")}
+            alt=""
+            aria-hidden="true"
+            className="aps-static-preview"
+          />
+        )}
         <div className="aps-cad-directions" aria-label="CAD navigation directions">
           <span>
             <MousePointer2 className="size-3.5" />
@@ -1120,16 +1146,24 @@ export function ApsCadViewer({
                 !viewerError && loadable && "animate-spin"
               )}
             />
-            <h3>{viewerError ? "Viewer error" : "Preparing APS model"}</h3>
+            <h3>
+              {viewerError
+                ? "Viewer error"
+                : loadable
+                  ? "Preparing APS model"
+                  : "Static CAD preview"}
+            </h3>
             <p>
               {viewerError ??
                 (viewerReady && !geometryReady
                   ? "Loading model geometry..."
                   : model
-                  ? `Translation status: ${status ?? "checking"} ${
-                      progress ? `(${progress})` : ""
-                    }`
-                  : "Upload the Fusion archive to APS to enable real subsystem isolation.")}
+                    ? model.accessToken
+                      ? `Translation status: ${status ?? "checking"} ${
+                          progress ? `(${progress})` : ""
+                        }`
+                      : "Static APS metadata is present, but no viewer token is available."
+                    : "Live APS tokens are not bundled into this static build, so the binder uses local CAD imagery here.")}
             </p>
           </div>
         )}

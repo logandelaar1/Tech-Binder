@@ -16,7 +16,7 @@ type UiState = {
 }
 
 export const useUiStore = create<UiState>((set) => ({
-  activeSection: "hero",
+  activeSection: "mechanical",
   selectedSystem: "super-structure",
   selectedCadSubsystem: "full",
   cadViewMode: "full",

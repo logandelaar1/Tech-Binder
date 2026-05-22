@@ -40,20 +40,10 @@ jobs:
       - name: Lint
         run: bun run lint
 
-      - name: Check Convex URL secret
-        run: |
-          if [ -z "$VITE_CONVEX_URL" ]; then
-            echo "::error::Missing GitHub Actions secret: VITE_CONVEX_URL"
-            exit 1
-          fi
-        env:
-          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
-
       - name: Build
         run: bun run build
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
-          VITE_CONVEX_URL: ${{ secrets.VITE_CONVEX_URL }}
 
       - name: Add SPA fallback
         run: |

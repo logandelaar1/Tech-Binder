@@ -15,7 +15,8 @@ export type MechanismDeepDive = {
   imageAlt: string
   stats: Array<{ label: string; value: string }>
   panelBullets: string[]
-  tabs: Record<BaseNoteTab, DetailSection[]> & Partial<Record<OptionalNoteTab, DetailSection[]>>
+  tabLabels?: Partial<Record<NoteTab, string>>
+  tabs: Partial<Record<NoteTab, DetailSection[]>>
 }
 
 export type GlossaryEntry = {
@@ -644,96 +645,22 @@ export const fullRobotDeepDive: MechanismDeepDive = {
     "All aluminum is 6061 from Metal Supermarkets unless a subsystem note calls out a different alloy.",
     "The final architecture concentrates weight and packaging around intake reach, a compact indexer, and moving-shot scoring.",
   ],
+  tabLabels: {
+    overview: "Version Comparison",
+  },
   tabs: {
     overview: [
       {
-        title: "Robot philosophy",
+        title: "Architecture notes",
         bullets: [
           "Icarus 2.0 prioritizes fuel acquisition, indexing, and shooting instead of climb hardware.",
           "The rack-and-pinion intakes, coaxial dye rotor indexer, and inverted pancake turret were treated as one continuous scoring path.",
           "The robot was designed with season-long iteration in mind, leaving room to rework mechanisms without throwing away the whole package.",
-        ],
-      },
-      {
-        title: "Baseline rules",
-        bullets: [
-          "All SRPP came from West Coast Products and was CNC machined.",
-          "All aluminum is 6061 from Metal Supermarkets unless otherwise specified.",
-          "The robot leans on pocketed plates, half-pocketed shells, stub axles, hollow hex with snap rings, and standardized hardware.",
-        ],
-      },
-    ],
-    materials: [
-      {
-        title: "Common material stack",
-        bullets: [
-          "Metal Supermarkets 6061 aluminum handles most machined and water-jetted plate structure.",
-          "SRPP is used for racks, intake plates, hopper walls, hood parts, and contact-prone mechanism details.",
-          "Polycarbonate remains useful for bowls, pans, covers, and low-mass sheet parts where transparency or bendability helps.",
-          "Printed Bambu PETG-CF, Bambu PLA Tough+, Bambu PLA Matte, Overture 95A TPU, and Formlabs Tough 1500 fill packaging and iteration roles.",
-        ],
-      },
-      {
-        title: "COTS and adhesives",
-        bullets: [
-          "WCP hardware appears throughout the robot: SRPP, nut strips, hex-lite shafts, compliant wheels, and x-contact bearings.",
-          "All hex bearings were Swyft Robotics hex bearings.",
-          "3M 8005 laminated the SRPP racks, and Loctite HY 4070 bonded carbon fiber transfer roller end caps.",
-          "Red Loctite was used where the team wanted permanent retention; blue Loctite was used on serviceable bumper and hopper hardware.",
-        ],
-      },
-    ],
-    build: [
-      {
-        title: "Electrical reliability practices",
-        bullets: [
           "For two seasons, the team had zero competition electrical issues from CAN wire breaks or motor power loss, ignoring collision damage.",
           "The wiring rule was NO CONNECTIONS: if a wire was too short, it was re-run from the PDP 2.0 rather than patched inline.",
           "Unavoidable connections at the Pigeon, Orange Pis, radio, roboRIO, and CANivore were soldered or secured, hot glued, and properly strain relieved.",
           "After Week Zero, everything except the drive base moved to shielded CAN.",
           "Every crimp was pull-tested and checked regularly between competitions.",
-        ],
-      },
-    ],
-    development: [
-      {
-        title: "Architecture lock",
-        bullets: [
-          "The final robot settled around dual side acquisition, a compact coaxial dye rotor indexer, and a low-profile turret instead of a climber.",
-          "The package kept the drivetrain, electronics, indexer, and turret serviceable while preserving as much fuel volume as possible.",
-        ],
-      },
-      {
-        title: "Weight and service iteration",
-        bullets: [
-          "Pocketing, half-pocketing, and removing low-value structure became the main weight-control tools.",
-          "The bumper pan and no-climb tradeoff opened up enough weight and package space to keep the scoring system reliable.",
-        ],
-      },
-      {
-        title: "Championship release",
-        bullets: [
-          "The final public CAD shows the scoring-first architecture after the rebuild, district tuning, and championship packaging pass.",
-          "Future picture slot: final full robot CAD render, final pit photo, and one annotated underside/serviceability image.",
-        ],
-      },
-    ],
-    leds: [
-      {
-        title: "Disabled states",
-        bullets: [
-          "Rainbow means the robot is disabled and all is good.",
-          "Flashing red means the robot is disabled and the battery voltage is below the desired threshold: 12.4 V at competitions and 12.1 V in testing.",
-        ],
-      },
-      {
-        title: "Match states",
-        bullets: [
-          "A Cylon animation means the robot is enabled in autonomous.",
-          "In teleop, the LEDs show shift progress bars.",
-          "Purple means transition/endgame, blue means active, and red means inactive.",
-          "When two active periods are next to each other, the lights combine the sections and show purple plus blue.",
-          "The lights flash when a shift change is coming.",
         ],
       },
     ],
@@ -759,114 +686,55 @@ export const mechanismDeepDives: Record<string, MechanismDeepDive> = {
       "Each side packages a Kraken x44 deploy motor, Kraken x60 feed motor, dead-axle polycarbonate rollers, a kicker, hopper walls, and a sewn net.",
       "Both intakes only take up about 1.3 inches of space on each side of the robot when closed.",
     ],
+    tabLabels: {
+      overview: "Overview",
+      materials: "Rollers",
+      build: "Structure",
+      development: "Net",
+    },
     tabs: {
       overview: [
         {
-          title: "Design intent",
+          title: "Overview",
           bullets: [
             "The dual intakes were built for aggressive cycle speeds and easy collection from either side of the robot.",
             "Rack and pinion was chosen because it can compress inward on impact and avoids a mechanism full of pivot joints.",
-            "The motor spacing was designed to work with both rollers or, if all spare rollers were gone, only the bottom roller with a longer belt.",
-          ],
-        },
-        {
-          title: "Competition result",
-          bullets: [
-            "The same four intake plates ran at all four competitions with no rack tooth chipping.",
-            "A homing sequence let the intake recover if the zero position moved because a belt skipped on impact.",
-            "The intakes stayed compact enough that the two sides only consumed about 1.3 inches per side when closed.",
+            "Each intake deploys with one Kraken x44 at about 2.91:1 and feeds with one Kraken x60 at about 2.27:1.",
+            "The same four intake plates ran at all four competitions with no rack tooth chipping, and homing recovered position if a belt skipped on impact.",
           ],
         },
       ],
       materials: [
         {
-          title: "Racks and plates",
-          bullets: [
-            "The racks are 3/8 inch, 10 DP SRPP racks made from two CNC-cut 3/16 inch SRPP sheets laminated with 3M 8005.",
-            "All SRPP was purchased from West Coast Products and CNC machined.",
-            "The kicker plates were CNC cut from 1/4 inch SRPP.",
-            "The final hopper walls are 1/8 inch SRPP after 1/16 inch bent polycarbonate proved too flimsy, cracked easily, and caught on the other intake.",
-          ],
-        },
-        {
-          title: "Rollers and printed parts",
+          title: "Rollers",
           bullets: [
             "Dead-axle rollers use 2-1/16 inch long, 1-7/8 inch ID, 2 inch OD polycarbonate rollers from McMaster-Carr.",
-            "Upper roller pulley end caps were 3D printed from Bambu PETG-CF.",
-            "Lower, more impact-prone roller pulley end caps were 3D printed from Overture 95A TPU.",
-            "Each pulley end cap uses two heat-set threaded inserts and button-head bolts into the polycarbonate roller.",
-            "For part simplification, all rollers used the same pulley end caps even when a pulley was not required.",
-          ],
-        },
-        {
-          title: "Transfer roller, net, and hardware",
-          bullets: [
-            "The carbon fiber transfer roller/jackshaft moves torque between both sides of each intake.",
-            "Transfer roller end caps were 3D printed from Formlabs Tough 1500 resin and bonded to the carbon fiber with Loctite HY 4070.",
-            "The intake hopper net started as black bumper fabric, then became athletic jersey mesh from Amazon sewn into a half-box shape.",
-            "WCP nut strips join the hopper wall panels at 90 degree angles with blue-Loctited button heads.",
-            "A WCP 3/8 inch hex-lite shaft runs across the bottom of the front hopper wall for rigidity and to keep fuel out of the gap near the intake roller.",
+            "Upper pulley end caps were printed from Bambu PETG-CF; lower impact-prone end caps were printed from Overture 95A TPU.",
+            "Stub axles were turned from 1/2 inch hex to 0.375 inch bearing diameter, leaving 0.125 inch of hex for wrench access.",
+            "The carbon fiber transfer roller/jackshaft moves torque between both intake sides, with Formlabs Tough 1500 end caps bonded using Loctite HY 4070.",
+            "Motor spacing was designed to run both rollers or, in a pinch, only the bottom roller with a longer belt.",
           ],
         },
       ],
       build: [
         {
-          title: "Rack lamination",
+          title: "Structure",
           bullets: [
-            "The SRPP bonding surfaces were lightly sanded with 80 grit sandpaper while being careful not to tear the SRPP fibers.",
-            "The sanded SRPP was cleaned with acetone before gluing.",
-            "Bolts and pan-head washers were used for alignment and clamping force while the 3M 8005 cured for 24 hours.",
-          ],
-        },
-        {
-          title: "Roller and axle details",
-          bullets: [
-            "Stub axles were turned from 1/2 inch hex shaft down to 0.375 inch bearing diameter for the two bearings inside the stub axle.",
-            "The turned axles leave 0.125 inch of hex so a flat hex wrench can be used during mounting.",
-            "A button head and washer on the inside keep the stub axle from falling out, and the hardware is red-Loctited.",
-            "A wrap or two of electrical tape around pulley mounting bolts helped keep them from backing out.",
-          ],
-        },
-        {
-          title: "Actuation and feed",
-          bullets: [
-            "Each intake deploys with one Kraken x44 geared about 2.91:1 before the rack and pinion: 17:50 on the small intake and 17:49 on the large intake.",
-            "The intake uses the built-in motor encoder for position, starting with intakes in at zero.",
-            "Each intake roller is powered by one Kraken x60 geared about 2.27:1 with a 15:34 ratio.",
-          ],
-        },
-        {
-          title: "Kicker and net",
-          bullets: [
-            "The kicker is a 254-style kicker with two WCP 3/8 inch hex-lite shafts spanning the sides.",
-            "Bolts were red-Loctited into the tapped shaft ends.",
-            "Surgical tubing was zip-tied to the kicker plates and intake side plates for deployment.",
-            "The net is mounted to the top plate and the 3/8 inch hex-lite shaft along the front of the intake with zip ties.",
-            "Every zip-tie location on the net was reinforced with sewing to prevent tearing.",
-            "The net is not elastic so drivers do not have to worry about whether the robot can fit under the trench.",
+            "The 3/8 inch, 10 DP racks are two CNC-cut 3/16 inch SRPP sheets laminated with 3M 8005, sanded with 80 grit, acetone-cleaned, and clamped for 24 hours.",
+            "The final hopper walls changed from flimsy, cracking 1/16 inch bent polycarbonate to 1/8 inch SRPP, which solved the interference issues.",
+            "WCP nut strips join hopper panels at 90 degrees, and a 3/8 inch WCP hex-lite shaft stiffens the front wall while keeping fuel out of the roller gap.",
+            "The 254-style kicker uses 1/4 inch SRPP plates, two WCP 3/8 inch hex-lite shafts, red-Loctited tapped shaft ends, and surgical tubing deployment.",
           ],
         },
       ],
       development: [
         {
-          title: "Prototype walls",
+          title: "Net",
           bullets: [
-            "Early hopper walls were 1/16 inch bent polycarbonate.",
-            "They were too flimsy, got caught on the other intake too often, and cracked too easily.",
-          ],
-        },
-        {
-          title: "SRPP solve",
-          bullets: [
-            "The final 1/8 inch SRPP hopper walls solved the stiffness and interference issues.",
-            "Nut strips let the panels join cleanly at 90 degrees without loose nuts.",
-          ],
-        },
-        {
-          title: "Competition validation",
-          bullets: [
-            "The same four intake plates ran at all four competitions with no rack tooth chipping.",
-            "Future picture slot: early polycarbonate wall, final SRPP wall, rack closeup, roller/stub axle detail, and sewn net shape under load.",
+            "The first net was a last-minute black bumper fabric version; the final net was athletic jersey mesh sewn into a half-box shape.",
+            "The half-box shape lets fuel volume push the net into a box instead of fighting an elastic return.",
+            "The net mounts to the top plate and front 3/8 inch hex-lite shaft with zip ties, and every zip-tie point is reinforced with sewing.",
+            "The non-elastic net keeps driving simpler because the driver does not have to worry about whether the robot can fit under the trench.",
           ],
         },
       ],
@@ -892,101 +760,34 @@ export const mechanismDeepDives: Record<string, MechanismDeepDive> = {
       "Two Kraken x60 motors drive the shooter and back hood rollers through a 17:15 upduction for better full-field passing.",
       "The hood moves from 6.4 degrees to 48 degrees for close shots, long shots, and full-field passing.",
     ],
+    tabLabels: {
+      overview: "Overview",
+      development: "Iterations",
+    },
     tabs: {
       overview: [
         {
-          title: "Architecture",
+          title: "Overview",
           bullets: [
             "The inverted pancake turret keeps the shooter low while preserving space for fuel flow through the robot.",
-            "The turret rotation system uses a Kraken x44, built-in motor encoder position tracking, and a constant starting zero.",
-            "The turret has 420 degrees of travel so the robot gets large aiming freedom without needing true continuous rotation.",
-            "The shooter, hood, and dye rotor stabilizer are packaged as one controlled feed into the turret.",
-          ],
-        },
-      ],
-      materials: [
-        {
-          title: "Turret ring and cable package",
-          bullets: [
-            "The main turret gear plate is made from pocketed 6061 aluminum and was water-jetted.",
-            "The turret bearing negative was 3D printed from Bambu PLA Tough+ and bolted to the turret ring; the specific bearing callout was left as a TBD in the notes.",
-            "The smaller inside cable-management ring is 3D printed and reduces the cable sleeve travel path from about 18 inches to about 12 inches.",
-            "The cable sleeve runs between a 1/32 inch polycarbonate top plate and the 1/8 inch turret mounting plate.",
-          ],
-        },
-        {
-          title: "Shooter, hood, and stabilizer",
-          bullets: [
-            "The 17 tooth shooter pulleys were 3D printed from Bambu PLA Tough+.",
+            "The 18 inch, 10 DP ring gear is pocketed 6061 aluminum and is driven by a Kraken x44 through a 45:1 reduction for 420 degrees of travel.",
+            "A smaller printed cable-management ring reduces the sleeve path from about 18 inches to about 12 inches, with no active retraction.",
+            "Two Kraken x60 motors drive the 3 inch shooter wheels and back hood rollers through a 17:15 upduction for full-field passing.",
+            "The hood moves from 6.4 degrees to 48 degrees, uses a Kraken x44 rack drive, and is cut from 1/4 inch SRPP with a riveted 6061 rack reinforcement.",
             "The shooter uses four 3 inch 45A Thrifty Bot shooter wheels and two rows of four 1 inch 45A Thrifty Bot sushi rollers as back hood wheels.",
-            "The hood is cut from 1/4 inch SRPP.",
-            "The hood rack is reinforced with a 1/8 inch 6061 aluminum rack riveted to the SRPP.",
             "The dye rotor stabilizer is machined from 1/2 inch UHMW for ultra-low friction.",
-          ],
-        },
-      ],
-      build: [
-        {
-          title: "Rotation",
-          bullets: [
-            "The turret ring gear diameter is 18 inches.",
-            "A 10 DP gear tooth pattern is cut along the turret plate edge for rotation.",
-            "The turret spins with a Kraken x44 through a 45:1 reduction using a 12 tooth to 30 tooth stage and a 10 tooth to 180 tooth stage.",
-            "Shim tape was used on the shaft for near-zero backlash between the motor and turret.",
-            "The turret uses the built-in motor encoder to track position from a constant zero.",
-          ],
-        },
-        {
-          title: "Cable management",
-          bullets: [
-            "There is no cable retraction method; the standard cable sleeve was allowed to do what it wanted, and it worked well.",
-            "The bulk of the 1/8 inch turret plate was left about 0.03 inches thick.",
-            "The plate could not be fully pocketed through because the cable sleeve would get caught.",
-            "Two carbon fiber rods run above the 1/8 inch turret plate to keep it from flexing down in the middle.",
-          ],
-        },
-        {
-          title: "Shooter and hood drive",
-          bullets: [
-            "Two Kraken x60 motors are geared up about 1:1.13 using a 17 tooth to 15 tooth ratio.",
-            "The upduction helps the robot make better full-field passes.",
-            "Two custom brass inertia flywheels were used, one on each side.",
-            "Four Thrifty Bot inertia disks were placed inside the shooter wheels; final MOI was left as a TBD in the notes.",
-            "The hood is powered by a Kraken x44 geared about 3.5:1 before the rack using 14:50 and then 23:24.",
-            "The hood travel range is 6.4 degrees to 48 degrees.",
-            "Shim tape was used on all hood shafts for near-zero backlash.",
-            "The hood starts down and can run a homing sequence if it needs to re-zero.",
-            "All hex shafts are WCP hollow hex turned down to length with snap rings at the ends.",
-          ],
-        },
-        {
-          title: "Feed stabilization",
-          bullets: [
-            "The UHMW stabilizer clamps around the dye rotor lid.",
-            "Its job is to create a clean, constant feed of fuel from the dye rotor indexer into the shooter.",
           ],
         },
       ],
       development: [
         {
-          title: "Architecture shift",
+          title: "Iterations",
           bullets: [
             "The final robot used the inverted pancake turret instead of the earlier coaxial turret concept.",
             "The lower profile preserved hopper space while keeping the shooter independently aimable.",
-          ],
-        },
-        {
-          title: "Backlash pass",
-          bullets: [
             "Shim tape was used in both the turret rotation and hood drive to tighten backlash.",
             "The largest reduction was kept late in the drive path to reduce loads and improve aiming feel.",
-          ],
-        },
-        {
-          title: "Shooter tuning",
-          bullets: [
             "The 17:15 upduction was kept because it improved full-field passing.",
-            "Future picture slot: turret ring detail, cable sleeve path, hood rack, shooter wheel stack, and UHMW dye rotor stabilizer.",
           ],
         },
       ],
@@ -1010,79 +811,35 @@ export const mechanismDeepDives: Record<string, MechanismDeepDive> = {
       "Hook and feed wheels are powered separately so fuel movement and feed timing can be tuned independently.",
       "The horizontal feed wheel uses a C-shaped fuel path for longer contact before fuel moves up into the rotor.",
     ],
+    tabLabels: {
+      overview: "Overview",
+      development: "Iterations",
+    },
     tabs: {
       overview: [
         {
-          title: "Coaxial indexer",
+          title: "Overview",
           bullets: [
             "The dye rotor is a compact vertically coaxial indexer, with the base of the bowl sitting about 1.3 inches above the bottom of the robot.",
-            "Hook and feed wheels are powered separately.",
-            "Both the hook and feed are chain-driven under the rotor to keep the mechanism vertically compact.",
-            "Three WCP 4.5 inch x-contact bearings allow the coaxial architecture.",
-          ],
-        },
-      ],
-      materials: [
-        {
-          title: "Printed and sheet components",
-          bullets: [
+            "Hook and feed wheels are powered separately, chain-driven under the rotor, and supported by three WCP 4.5 inch x-contact bearings.",
+            "The feed wheels use two Kraken x44 motors geared roughly 1:1, while the hook is geared around 30:1.",
+            "The horizontal 2 inch WCP 45A compliant wheel uses a C-shaped path for longer fuel contact before moving fuel into the rotor.",
+            "The vertical feed roller is three stacked 3 inch WCP 45A compliant wheels cut down to about 1.5 inches.",
             "The top portion of the dye rotor is 3D printed from Bambu PETG-CF.",
             "The bottom parts sandwiched between the aluminum hook plates are 3D printed from Bambu PLA Tough+.",
-            "Those lower printed parts use very low infill with zero top and bottom layers.",
-            "Tapped 3/8 inch hex shafts provide the bulk of the lower rotor structure.",
-            "The ramp is a simple 3D printed Bambu PLA Tough+ part.",
-          ],
-        },
-        {
-          title: "Bowl and wheels",
-          bullets: [
             "The bowl is two pieces of 1/8 inch polycarbonate split for easy removal.",
-            "The bowl mounts to threaded inserts on the MK5n modules and the battery mount.",
-            "There is no fancy funneling because there was not much room for fuel to sit on the bowl edges anyway.",
-            "The vertical feed roller is three stacked 3 inch WCP 45A compliant wheels cut down to about 1.5 inches.",
-            "The horizontal feed roller is one 2 inch WCP 45A compliant wheel.",
-          ],
-        },
-      ],
-      build: [
-        {
-          title: "Power and reductions",
-          bullets: [
-            "The feed wheels use two Kraken x44 motors geared roughly 1:1.",
-            "The feed rollers are driven through a planetary-like gear arrangement.",
-            "The hook is geared around a 30:1 ratio.",
-            "Both the hook and the feed are chain-driven underneath the rotor.",
-          ],
-        },
-        {
-          title: "Fuel path",
-          bullets: [
-            "The horizontal feed roller moves fuel up and into the rotor.",
-            "Fuel follows a C-shaped path around the horizontal wheel so it stays in contact with the feed wheel longer.",
-            "The compact bowl and rotor geometry were driven by the lack of available vertical and edge storage space.",
           ],
         },
       ],
       development: [
         {
-          title: "Vertical package",
+          title: "Iterations",
           bullets: [
             "The dye rotor was pushed as low as possible; the bowl base sits about 1.3 inches above the bottom of the robot.",
             "The compact height made the coaxial bearing stack and under-rotor chain drives central to the design.",
-          ],
-        },
-        {
-          title: "Feed authority",
-          bullets: [
             "The horizontal 2 inch WCP 45A compliant wheel was shaped around a C path to keep fuel in contact longer.",
             "The vertical roller uses three cut-down 3 inch WCP 45A compliant wheels to fit the feed stack.",
-          ],
-        },
-        {
-          title: "Serviceable bowl",
-          bullets: [
             "The two-piece 1/8 inch polycarbonate bowl was split for easy removal.",
-            "Future picture slot: lid print, under-rotor chain drive, x-contact bearing stack, C-shaped feed path, and two-piece bowl mounting.",
           ],
         },
       ],
@@ -1106,107 +863,48 @@ export const mechanismDeepDives: Record<string, MechanismDeepDive> = {
       "The frame combines 1/16 inch 2x1 box tube on intake sides, 1/4 inch side plates, and a 1/8 inch bellypan.",
       "The bumpers became part of the superstructure, including welded aluminum backers, cross-linked foam, and a polycarbonate bumper pan.",
     ],
+    tabLabels: {
+      overview: "Overview",
+      materials: "Drivetrain",
+      build: "Bumpers",
+    },
     tabs: {
       overview: [
         {
-          title: "Backbone",
-          bullets: [
-            "The drivetrain uses four SDS MK5n modules with Kraken x60 motors as drive motors and four Kraken x44 motors as steering motors.",
-            "Refire adapter boards for Kraken x44 motors power the CANcoders, and all wires are directly soldered to the boards.",
-            "The CAN loop was never split off on the drive modules; it runs drive motor -> CANcoder -> steer motor.",
-            "The final ratio is the R1 gear ratio.",
-          ],
-        },
-      ],
-      materials: [
-        {
-          title: "Frame and side plates",
+          title: "Overview",
           bullets: [
             "All 6061 aluminum was purchased from Metal Supermarkets unless another alloy is called out.",
             "Along the intake sides, the frame uses 1/16 inch 2x1 box tube.",
             "Along the non-intake sides, a 2 inch tall by 0.25 inch frame rail runs between the swerve modules.",
-            "Those rails mount with WCP nut strips and red Loctite.",
             "The 1/4 inch side plates form the bulk of the robot structure and support both intakes and the turret mounting plate.",
             "The 1/8 inch structural bellypan has an electronics mounting hole pattern and a recessed pocket for the dye rotor bearing.",
             "1/16 inch 1x1 box tube rails span the middle of the robot to keep the bellypan from sagging under the dye rotor weight.",
           ],
         },
+      ],
+      materials: [
         {
-          title: "Bumpers and LED hardware",
+          title: "Drivetrain",
           bullets: [
-            "The bumpers use FoamByMail 3 lb cross-linked closed-cell foam cut down to size.",
-            "The bumper back plates were CNC machined from 3033 aluminum.",
-            "The team originally planned to bend the 3000-series backers, but pivoted to welding because a brake of the right length was not available.",
-            "Machining 3000-series aluminum was brutal because it was soft, gummy, and gummed up cutters easily.",
-            "LEDs are 144 pixels-per-meter strips from Amazon mounted in 3D printed Bambu PLA Matte holders with snap-in diffuser slots.",
-            "All hex bearings were Swyft Robotics hex bearings.",
+            "The drivetrain uses four SDS MK5n modules with Kraken x60 drive motors, Kraken x44 steering motors, and the R1 gear ratio.",
+            "Refire adapter boards power the CANcoders from the Kraken x44 steering motor wiring package.",
+            "All wires were directly soldered to the adapter boards.",
+            "The CAN path on each module stays direct instead of split: drive motor to CANcoder to steer motor.",
           ],
         },
       ],
       build: [
         {
-          title: "Side plate iteration",
+          title: "Bumpers",
           bullets: [
-            "Version 1 side plates were CNC machined and took about 4.5 hours each.",
-            "Version 2 side plates were water-jetted, saving a bunch of fabrication time.",
-            "The 1/4 inch side plates made more sense when the robot still had two intakes and a climber, because all of that only took 1.3 inches per side.",
-            "Even after the climb was removed, the 1/4 inch plates still acted as key structure for intakes and the turret plate.",
-            "The final weight for each side plate was a little over 4 pounds.",
-          ],
-        },
-        {
-          title: "Bumper package",
-          bullets: [
+            "The bumpers use FoamByMail 3 lb cross-linked closed-cell foam cut down to size.",
+            "The bumper back plates were CNC machined from 3033 aluminum, then welded after the team could not find a brake long enough to bend them.",
             "The welded aluminum bumper backers were wrapped in fabric and the fabric was riveted to the metal backer.",
             "Halfway through the season, a 1/8 inch polycarbonate bumper pan was added.",
             "The bumper pan made going over the bump easier and let the team remove the old battery-retention plate.",
             "Letting the battery rest on the bumper pan helped the robot make weight.",
-            "Bumpers mount with two 3 inch bolts through the box tube and nuts on the other side.",
-            "Rivnuts were tried first and failed quickly.",
-            "The robot had to be flipped to change bumpers, but a full bumper change could still happen in under a minute with the robot back upright.",
-          ],
-        },
-      ],
-      development: [
-        {
-          title: "Side plate V1",
-          bullets: [
-            "Version 1 side plates were CNC machined and took about 4.5 hours each.",
-            "The thick plates made sense while the robot still carried two intakes and a climber in very little side space.",
-          ],
-        },
-        {
-          title: "Side plate V2",
-          bullets: [
-            "Version 2 side plates were water-jetted to save fabrication time.",
-            "The final plates stayed as structure for both intakes and the turret mounting plate even after the climber was removed.",
-          ],
-        },
-        {
-          title: "Bumper evolution",
-          bullets: [
-            "Rivnuts failed quickly, so the final bumpers used two 3 inch bolts through the box tube with nuts on the other side.",
-            "The mid-season polycarbonate bumper pan improved bump traversal and helped the robot make weight.",
-            "Future picture slot: side plate V1/V2 comparison, welded bumper backer, bumper pan underside, bellypan pocket, and LED holder/diffuser.",
-          ],
-        },
-      ],
-      leds: [
-        {
-          title: "Disabled states",
-          bullets: [
-            "Rainbow means the robot is disabled and all is good.",
-            "Flashing red means the robot is disabled and the battery voltage is below the desired threshold: 12.4 V at competitions and 12.1 V in testing.",
-          ],
-        },
-        {
-          title: "Auto and teleop states",
-          bullets: [
-            "A Cylon animation means the robot is enabled in autonomous.",
-            "In teleop, the LEDs show shift progress bars.",
-            "Purple means transition/endgame, blue means active, and red means inactive.",
-            "When two active periods are next to each other, the lights combine the sections and show purple plus blue.",
-            "The lights flash when a shift change is coming.",
+            "Rivnuts failed quickly, so the final bumpers use two 3 inch bolts through the box tube with nuts on the other side.",
+            "The robot had to be flipped to change bumpers, but a full bumper change could still happen in under a minute.",
           ],
         },
       ],
