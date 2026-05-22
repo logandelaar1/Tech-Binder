@@ -1,0 +1,9 @@
+name = "team5000-aps-token"
+main = "worker/src/index.ts"
+compatibility_date = "2024-12-02"
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.development]
+vars = { ENVIRONMENT = "development" }

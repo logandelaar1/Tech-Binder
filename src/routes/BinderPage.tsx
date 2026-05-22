@@ -32,7 +32,6 @@ import {
   seasonEvents,
   seasonStats,
   softwareTabs,
-  thankYouCards,
   type BinderTab,
   type CncOperation,
   type Iteration,
@@ -134,7 +133,6 @@ export function BinderPage() {
       <SoftwareSection />
       <SeasonSection />
       <OpenAllianceSection />
-      <ThanksSection />
       <SelectionGlossary />
       <ManufacturingModal
         open={manufacturingOpen}
@@ -599,11 +597,17 @@ function ManufacturingModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="manufacturing-modal" showCloseButton>
         <DialogHeader className="manufacturing-modal-header">
-          <DialogTitle>Fusion 360 CNC Settings Archive</DialogTitle>
-          <DialogDescription>
-            Router feeds, speeds, tooling notes, and setup references for 6061,
-            polycarbonate, and SRPP.
-          </DialogDescription>
+          <div>
+            <DialogTitle>Fusion 360 CNC Settings Archive</DialogTitle>
+            <DialogDescription>
+              Router feeds, speeds, tooling notes, and setup references for 6061,
+              polycarbonate, and SRPP.
+            </DialogDescription>
+          </div>
+          <a href="/manufacturing-print" className="binder-button secondary">
+            <Printer className="size-4" />
+            Print
+          </a>
         </DialogHeader>
         <ManufacturingArchive />
       </DialogContent>
@@ -651,11 +655,6 @@ function ComparisonSlider({ iterations }: { iterations: Iteration[] }) {
         role="img"
         aria-label={`Compare ${before.label} and ${after.label}`}
       >
-        <div className="comparison-fill comparison-fill-before" />
-        <div
-          className="comparison-fill comparison-fill-after"
-          style={{ clipPath: `inset(0 0 0 ${position}%)` }}
-        />
         <img
           src={assetPath(after.image)}
           alt={after.alt}
@@ -742,6 +741,60 @@ function IterationSlider({ iterations }: { iterations: Iteration[] }) {
 }
 
 function LedVisualStage() {
+  const [teleopTime, setTeleopTime] = useState(0)
+  const teleopDuration = 10 + 25 + 25 + 25 + 55
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTeleopTime((t) => (t + 0.05) % teleopDuration)
+    }, 50)
+    return () => clearInterval(interval)
+  }, [])
+
+  const getTeleopStage = () => {
+    if (teleopTime < 10) return {
+      label: "Transition Shift",
+      color: "#aa44ff",
+      time: teleopTime,
+      duration: 10,
+      strobeAt: 3
+    }
+    if (teleopTime < 35) return {
+      label: "Inactive Shift 1",
+      color: "#ff3333",
+      time: teleopTime - 10,
+      duration: 25,
+      strobeAt: 3
+    }
+    if (teleopTime < 60) return {
+      label: "Active Shift 1",
+      color: "#1e5a96",
+      time: teleopTime - 35,
+      duration: 25,
+      strobeAt: 3
+    }
+    if (teleopTime < 85) return {
+      label: "Inactive Shift 2",
+      color: "#ff3333",
+      time: teleopTime - 60,
+      duration: 25,
+      strobeAt: 3
+    }
+    return {
+      label: "Active Shift 2 & Endgame",
+      color: "#aa44ff",
+      time: teleopTime - 85,
+      duration: 55,
+      strobeAt: 3
+    }
+  }
+
+  const stage = getTeleopStage()
+  const timeRemaining = Math.max(0, stage.duration - stage.time)
+  const isStrobing = timeRemaining <= stage.strobeAt
+  const remainingPercent = (timeRemaining / stage.duration) * 100
+  const strobeOpacity = isStrobing && Math.floor(teleopTime * 2) % 2 === 0 ? 0.15 : 1
+
   const patterns = [
     {
       label: "Disabled",
@@ -751,17 +804,12 @@ function LedVisualStage() {
     {
       label: "Low battery",
       className: "low-battery",
-      detail: "Flashing red flags voltage below the event or testing threshold.",
+      detail: "Red LED fades on and off once every second.",
     },
     {
       label: "Autonomous",
       className: "cylon",
       detail: "A red scanning sweep makes autonomous state obvious from the glass.",
-    },
-    {
-      label: "Teleop",
-      className: "teleop",
-      detail: "Segmented progress bars show active, inactive, and transition windows.",
     },
   ]
 
@@ -777,13 +825,30 @@ function LedVisualStage() {
             <small>{pattern.detail}</small>
           </article>
         ))}
+
+        <article>
+          <div
+            className="led-strip led-teleop-timer"
+            aria-hidden="true"
+            style={{
+              background: `linear-gradient(90deg, white 0%, white ${100 - remainingPercent}%, ${stage.color} ${100 - remainingPercent}%, ${stage.color} 100%)`,
+              opacity: strobeOpacity,
+            }}
+          >
+            <span />
+          </div>
+          <strong>
+            {stage.label} – {timeRemaining.toFixed(1)}s
+          </strong>
+          <small>Match timer: Transition (10s) → Inactive 1 (25s) → Active 1 (25s) → Inactive 2 (25s) → Active & Endgame (55s). Strobes when ≤3s.</small>
+        </article>
       </div>
     </div>
   )
 }
 
 function SoftwareSection() {
-  const [activeTab, setActiveTab] = useState("cameras")
+  const [activeTab, setActiveTab] = useState("shooting")
   const tab = softwareTabs.find((item) => item.id === activeTab) ?? softwareTabs[0]
 
   return (
@@ -915,8 +980,6 @@ function SeasonSection() {
     <BinderSection
       id="season"
       eyebrow="Season Recap"
-      title="Consistency became the story."
-      deck="The season combined mechanical iteration, software maturity, public documentation, and the strongest awards run in Team 5000 history."
     >
       <div className="season-stats">
         {seasonStats.map((stat) => (
@@ -960,9 +1023,6 @@ function OpenAllianceSection() {
   return (
     <BinderSection
       id="open-alliance"
-      eyebrow="Open Alliance"
-      title="Built in public by default."
-      deck="CAD links, code references, build notes, and public recap material keep the binder aligned with Open Alliance culture."
     >
       <div className="resource-grid">
         {resources.map((resource) => (
@@ -978,21 +1038,6 @@ function OpenAllianceSection() {
             <p>{resource.description}</p>
             <ArrowUpRight className="size-5" />
           </a>
-        ))}
-      </div>
-    </BinderSection>
-  )
-}
-
-function ThanksSection() {
-  return (
-    <BinderSection id="thanks" eyebrow="Thanks">
-      <div className="thanks-grid">
-        {thankYouCards.map((card) => (
-          <article key={card.name} className="thanks-card">
-            <h3>{card.name}</h3>
-            <p>{card.body}</p>
-          </article>
         ))}
       </div>
     </BinderSection>

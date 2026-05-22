@@ -129,7 +129,7 @@ async function apsTokenProvider(
 
   if (!response.ok) {
     throw new Error(
-      `APS token endpoint returned ${response.status}. Run \`bun dev\` or \`bun preview\` to enable the live CAD viewer.`
+      `APS token endpoint returned ${response.status}. Run \`npm run dev\` to enable the live CAD viewer.`
     )
   }
 

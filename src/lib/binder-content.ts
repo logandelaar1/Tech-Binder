@@ -68,7 +68,6 @@ export const navItems = [
   { label: "Software", href: "#software" },
   { label: "Season", href: "#season" },
   { label: "Open Alliance", href: "#open-alliance" },
-  { label: "Thanks", href: "#thanks" },
 ]
 
 export const robotSpecs: Metric[] = [
@@ -151,24 +150,6 @@ export const fullAssemblyTabs: BinderTab[] = [
       "LED wiring was routed cleanly, strain relieved, labeled, and kept serviceable during panel or assembly removal.",
       "LED states were treated like a real communication system for enabled/disabled state, mechanism state, readiness, and debugging.",
       "The system was designed so it could be disabled or ignored without affecting core robot function.",
-    ],
-    blocks: [
-      {
-        title: "Disabled and healthy",
-        body: "A rainbow pattern means the robot is disabled and the main system checks look good.",
-      },
-      {
-        title: "Low battery",
-        body: "Flashing red means the battery voltage is lower than we want: 12.4 V at events and 12.1 V during testing.",
-      },
-      {
-        title: "Autonomous",
-        body: "A Cylon-style sweep shows that the robot is enabled in autonomous.",
-      },
-      {
-        title: "Teleop shift progress",
-        body: "Progress bars show the flow of the match. Purple represents transition/endgame, blue represents active scoring windows, and red represents inactive periods.",
-      },
     ],
   },
 ]
@@ -508,6 +489,11 @@ export const softwareTabs: BinderTab[] = [
       "Passing target dynamically adjusts based on distance to account for roll and encourage clustering in the corner.",
       "Robot automatically begins scoring 2 seconds before an active shift starts and stops 1 second after the shift ends to maximize scoring time.",
     ],
+    media: {
+      src: "/media/Shoot-on-the-move.GIF",
+      alt: "Shoot-on-the-move demonstration",
+      caption: "Shoot-on-the-move in action",
+    },
   },
   {
     id: "zones",
@@ -522,6 +508,11 @@ export const softwareTabs: BinderTab[] = [
       "Predictive zones allow for actions that take time, such as aligning to the trenches and ducking the hood, by determining whether the robot will be in the zone in a set amount of time. This lets the robot score while partially in the trench while giving enough time to duck the hood, and it lets the robot drive close to the trench without auto align triggering until it is driving towards the trench.",
       "Zone and PredictiveZone interfaces allow easy combination of zones to act as one zone.",
     ],
+    media: {
+      src: "/media/predictivefieldzones.GIF",
+      alt: "Predictive field zones visualization",
+      caption: "Predictive field zones in action",
+    },
   },
   {
     id: "cameras",
@@ -537,9 +528,9 @@ export const softwareTabs: BinderTab[] = [
       "Redundant sightlines helped when field elements, defenders, or the robot structure blocked individual cameras.",
     ],
     media: {
-      src: "/media/CAMERAS.png",
+      src: "/media/cameras.GIF",
       alt: "Six-camera vision and odometry software reference",
-      caption: "360 vision concept",
+      caption: "360 vision in action",
     },
   },
   {
@@ -557,6 +548,11 @@ export const softwareTabs: BinderTab[] = [
       "Automatic intaking of game pieces.",
       "Helpful for simulated driver practice and autonomous testing.",
     ],
+    media: {
+      src: "/media/fuelsim.GIF",
+      alt: "FuelSim simulation demonstration",
+      caption: "FuelSim in action",
+    },
   },
 ]
 
