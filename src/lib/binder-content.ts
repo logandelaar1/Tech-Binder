@@ -120,20 +120,20 @@ export const fullAssemblyTabs: BinderTab[] = [
     ],
     iterations: [
       {
-        label: "Version 1",
-        title: "Week 0 test robot",
-        body:
-          "Version 1 was basically our first full robot package that we threw together with the goal of testing everything at Week 0. It let us prove out the major ideas, find what was annoying to service, and see which parts of the robot needed to change before our first real event.",
-        image: "/media/icarus-version-2.png",
-        alt: "Icarus version 1 CAD render",
-      },
-      {
         label: "Version 2",
         title: "First event rebuild",
         body:
+          "Version 1 was basically our first full robot package that we threw together with the goal of testing everything at Week 0. It let us prove out the major ideas, find what was annoying to service, and see which parts of the robot needed to change before our first real event.",
+        image: "/media/icarus-version-2.png",
+        alt: "Icarus version 2 CAD render",
+      },
+      {
+        label: "Version 1",
+        title: "Week 0 Test Robot",
+        body:
           "Version 2 was the rebuild after Week 0. We took what we learned from testing and turned it into the robot we actually wanted to compete with. The structure got cleaner, the packaging got tighter, and a lot of the small issues from the first version were fixed before our first event.",
         image: "/media/icarus-version-1.png",
-        alt: "Icarus version 2 CAD render",
+        alt: "Icarus version 1 CAD render",
       },
     ],
   },
