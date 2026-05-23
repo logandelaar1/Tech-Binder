@@ -133,7 +133,7 @@ async function apsTokenProvider(
   callback: (token: string, expiresIn: number) => void
 ) {
   const response = await fetch(APS_TOKEN_ENDPOINT ?? "/_api/aps/token")
-  
+
   if (!response.ok) {
     throw new Error(
       `APS token endpoint returned ${response.status}. Run \`npm run dev\` to enable the live CAD viewer.`
@@ -845,7 +845,7 @@ export function ApsCadViewer({
               },
               (_errorCode, errorMessage) => {
                 reject(
-                  new Error(errorMessage || "APS document load failed.")
+                  new Error(`APS document load failed: ${_errorCode} ${errorMessage ?? ""}`)
                 )
               }
             )
