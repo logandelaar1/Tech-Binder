@@ -45,8 +45,7 @@ jobs:
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
           VITE_APS_TOKEN_ENDPOINT: https://team5000-aps-token.hammerheads.workers.dev/aps/token
-          VITE_APS_MODEL_URN: ${{ secrets.VITE_APS_MODEL_URN }}
-
+          VITE_APS_MODEL_URN: dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dGVhbTUwMDAtdGVjaC1iaW5kZXItemlka25jMzZ2dnFmcXNzNXJ2L2ZpbmFsLWljYXJ1cy0yMDI2LTA1LTE5LmYzeg
       - name: Add SPA fallback
         run: |
           cp dist/index.html dist/404.html
