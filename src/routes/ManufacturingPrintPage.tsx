@@ -80,12 +80,10 @@ function PrintManufacturingSection() {
         <div className="print-cnc-operations">
           {visibleOperations.map((operation) => (
             <article key={operation.id} className="print-cnc-card">
-              <h3>{operation.name}</h3>
               <div className="print-cnc-details">
                 <span><strong>Material:</strong> {operation.material}</span>
                 <span><strong>Tool:</strong> {operation.tool}</span>
-                <span><strong>Speed:</strong> {operation.speed}</span>
-                <span><strong>Feed:</strong> {operation.feed}</span>
+
               </div>
               {operation.notes && <p>{operation.notes}</p>}
             </article>
