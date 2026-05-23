@@ -29,6 +29,13 @@ type ViewableOption = {
 
 const APS_MODEL_URN = import.meta.env.VITE_APS_MODEL_URN as string | undefined
 
+
+const APS_TOKEN_ENDPOINT =
+
+  import.meta.env.VITE_APS_TOKEN_ENDPOINT as string | undefined
+
+
+
 type ViewerWindow = Window & {
   THREE?: {
     Box3: new (min?: THREE.Vector3, max?: THREE.Vector3) => THREE.Box3
@@ -125,8 +132,8 @@ const viewerSubsystems: ViewerSubsystem[] = [
 async function apsTokenProvider(
   callback: (token: string, expiresIn: number) => void
 ) {
-  const response = await fetch("/_api/aps/token")
-
+  const response = await fetch(APS_TOKEN_ENDPOINT ?? "/_api/aps/token")
+  
   if (!response.ok) {
     throw new Error(
       `APS token endpoint returned ${response.status}. Run \`npm run dev\` to enable the live CAD viewer.`

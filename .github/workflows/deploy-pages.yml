@@ -44,6 +44,8 @@ jobs:
         run: bun run build
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          VITE_APS_TOKEN_ENDPOINT: https://team5000-aps-token.hammerheads.workers.dev/aps/token
+          VITE_APS_MODEL_URN: ${{ secrets.VITE_APS_MODEL_URN }}
 
       - name: Add SPA fallback
         run: |
