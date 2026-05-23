@@ -207,30 +207,6 @@ function TopNav({
         })}
       </nav>
 
-      <div className="header-actions">
-        <ThemeButton />
-        <button
-          type="button"
-          className="icon-button manufacturing-header-button"
-          aria-label="Open manufacturing archive"
-          onClick={onManufacturingOpen}
-        >
-          <Factory className="size-4" />
-          <span>Manufacturing</span>
-        </button>
-        <a className="icon-button" href={assetPath("/print")} aria-label="Print binder">
-          <Printer className="size-4" />
-          <span>Print</span>
-        </a>
-        <button
-          type="button"
-          className="icon-button mobile-menu-button"
-          aria-label="Open navigation"
-          onClick={() => onMobileOpenChange(!mobileOpen)}
-        >
-          {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
-      </div>
 
       {mobileOpen && (
         <nav className="mobile-nav" aria-label="Mobile navigation">
